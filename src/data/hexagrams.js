@@ -157,7 +157,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "111101",
+    "binary": "101111",
     "name": "同人",
     "text": "同人于野，亨。利涉大川，利君子贞。",
     "lines": [
@@ -170,7 +170,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "101111",
+    "binary": "111101",
     "name": "大有",
     "text": "元亨。",
     "lines": [
@@ -183,7 +183,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "000100",
+    "binary": "001000",
     "name": "谦",
     "text": "亨，君子有终。",
     "lines": [
@@ -196,7 +196,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "001000",
+    "binary": "000100",
     "name": "豫",
     "text": "利建侯行师。",
     "lines": [
@@ -209,7 +209,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "101001",
+    "binary": "100110",
     "name": "随",
     "text": "元亨，利贞，无咎。",
     "lines": [
@@ -222,7 +222,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "110100",
+    "binary": "011001",
     "name": "蛊",
     "text": "元亨，利涉大川。先甲三日，后甲三日。",
     "lines": [
@@ -235,7 +235,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "000011",
+    "binary": "110000",
     "name": "临",
     "text": "元亨，利贞。至于八月有凶。",
     "lines": [
@@ -248,7 +248,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "110000",
+    "binary": "000011",
     "name": "观",
     "text": "盥而不荐，有孚顒若。",
     "lines": [
@@ -261,7 +261,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "101011",
+    "binary": "100101",
     "name": "噬嗑",
     "text": "亨。利用狱。",
     "lines": [
@@ -274,7 +274,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "110101",
+    "binary": "101001",
     "name": "贲",
     "text": "亨。小利有攸往。",
     "lines": [
@@ -313,7 +313,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "111001",
+    "binary": "100111",
     "name": "无妄",
     "text": "元亨，利贞。其匪正有眚，不利有攸往。",
     "lines": [
@@ -326,7 +326,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "100111",
+    "binary": "111001",
     "name": "大畜",
     "text": "利贞。不家食吉，利涉大川。",
     "lines": [
@@ -391,7 +391,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "011100",
+    "binary": "001110",
     "name": "咸",
     "text": "亨。利贞，取女吉。",
     "lines": [
@@ -404,7 +404,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "001110",
+    "binary": "011100",
     "name": "恒",
     "text": "亨，无咎，利贞。利有攸往。",
     "lines": [
@@ -417,7 +417,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "001001",
+    "binary": "001111",
     "name": "遯",
     "text": "亨。小利贞。",
     "lines": [
@@ -443,7 +443,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "101000",
+    "binary": "000101",
     "name": "晋",
     "text": "康侯用锡马蕃庶，昼日三接。",
     "lines": [
@@ -456,7 +456,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "000101",
+    "binary": "101000",
     "name": "明夷",
     "text": "利艰贞。",
     "lines": [
@@ -495,7 +495,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "010011",
+    "binary": "001010",
     "name": "蹇",
     "text": "利西南，不利东北。利见大人，贞吉。",
     "lines": [
@@ -508,7 +508,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "110010",
+    "binary": "010100",
     "name": "解",
     "text": "利西南，无所往，其来复吉。有攸往，夙吉。",
     "lines": [
@@ -521,7 +521,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "100011",
+    "binary": "110001",
     "name": "损",
     "text": "有孚，元吉，无咎，可贞。利有攸往，曷之用？二簋可用享。",
     "lines": [
@@ -534,7 +534,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "110001",
+    "binary": "100011",
     "name": "益",
     "text": "利有攸往，利涉大川。",
     "lines": [
@@ -547,7 +547,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "111011",
+    "binary": "111110",
     "name": "夬",
     "text": "扬于王庭，孚号，有厉。告自邑，不利即戎，利有攸往。",
     "lines": [
@@ -560,7 +560,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "110111",
+    "binary": "011111",
     "name": "姤",
     "text": "女壮，勿用取女。",
     "lines": [
@@ -573,7 +573,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "000011",
+    "binary": "000110",
     "name": "萃",
     "text": "亨。王假有庙，利见大人，亨利贞。用大牲吉，利有攸往。",
     "lines": [
@@ -586,7 +586,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "001000",
+    "binary": "011000",
     "name": "升",
     "text": "元亨，用见大人，勿恤，南征吉。",
     "lines": [
@@ -599,7 +599,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "011010",
+    "binary": "010110",
     "name": "困",
     "text": "亨，贞大人吉，无咎。有言不信。",
     "lines": [
@@ -612,7 +612,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "010100",
+    "binary": "011010",
     "name": "井",
     "text": "改邑不改井，无丧无得。往来井井，汔至亦未繘井，羸其瓶，凶。",
     "lines": [
@@ -625,7 +625,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "101011",
+    "binary": "101110",
     "name": "革",
     "text": "己日乃孚，元亨，利贞，悔亡。",
     "lines": [
@@ -638,7 +638,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "100101",
+    "binary": "011101",
     "name": "鼎",
     "text": "元吉，亨。",
     "lines": [
@@ -651,7 +651,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "100110",
+    "binary": "100100",
     "name": "震",
     "text": "亨。震来虩虩，笑言哑哑。震惊百里，不丧匕鬯。",
     "lines": [
@@ -664,7 +664,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "011001",
+    "binary": "001001",
     "name": "艮",
     "text": "艮其背，不获其身；行其庭，不见其人，无咎。",
     "lines": [
@@ -677,7 +677,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "110110",
+    "binary": "001011",
     "name": "渐",
     "text": "女归吉，利贞。",
     "lines": [
@@ -690,7 +690,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "001100",
+    "binary": "110100",
     "name": "归妹",
     "text": "征凶，无攸利。",
     "lines": [
@@ -729,7 +729,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "011101",
+    "binary": "011011",
     "name": "巽",
     "text": "小亨，利有攸往，利见大人。",
     "lines": [
@@ -742,7 +742,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "101110",
+    "binary": "110110",
     "name": "兑",
     "text": "亨，利贞。",
     "lines": [
@@ -755,7 +755,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "100100",
+    "binary": "010011",
     "name": "涣",
     "text": "亨。王假有庙，利涉大川，利贞。",
     "lines": [
@@ -768,7 +768,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "001110",
+    "binary": "110010",
     "name": "节",
     "text": "亨。苦节不可贞。",
     "lines": [
@@ -778,6 +778,58 @@ export const hexagrams = [
       "六四：安节，亨。",
       "九五：甘节，吉，往有尚。",
       "上六：苦节，贞凶，悔亡。"
+    ]
+  },
+  {
+    "binary": "110011",
+    "name": "中孚",
+    "text": "中孚，豚鱼吉。利涉大川，利贞。",
+    "lines": [
+      "初九：虞吉，有它不燕。",
+      "九二：鸣鹤在阴，其子和之。我有好爵，吾与尔靡之。",
+      "六三：得敌，或鼓或罢，或泣或歌。",
+      "六四：月几望，马匹亡，无咎。",
+      "九五：有孚挛如，无咎。",
+      "上九：翰音登于天，贞凶。"
+    ]
+  },
+  {
+    "binary": "001100",
+    "name": "小过",
+    "text": "小过，亨，利贞。可小事，不可大事。飞鸟遗之音，不宜上，宜下，大吉。",
+    "lines": [
+      "初六：飞鸟以凶。",
+      "六二：过其祖，遇其妣；不及其君，遇其臣，无咎。",
+      "九三：弗过防之，从或戕之，凶。",
+      "九四：无咎，弗过遇之。往厉必戒，勿用永贞。",
+      "六五：密云不雨，自我西郊。公弋取彼在穴。",
+      "上六：弗遇过之，飞鸟离之，凶，是谓灾眚。"
+    ]
+  },
+  {
+    "binary": "101010",
+    "name": "既济",
+    "text": "既济，亨小，利贞。初吉终乱。",
+    "lines": [
+      "初九：曳其轮，濡其尾，无咎。",
+      "六二：妇丧其茀，勿逐，七日得。",
+      "九三：高宗伐鬼方，三年克之，小人勿用。",
+      "六四：繻有衣袽，终日戒。",
+      "九五：东邻杀牛，不如西邻之禴祭，实受其福。",
+      "上六：濡其首，厉。"
+    ]
+  },
+  {
+    "binary": "010101",
+    "name": "未济",
+    "text": "未济，亨。小狐汔济，濡其尾，无攸利。",
+    "lines": [
+      "初六：濡其尾，吝。",
+      "九二：曳其轮，贞吉。",
+      "六三：未济，征凶，利涉大川。",
+      "九四：贞吉，悔亡。震用伐鬼方，三年有赏于大国。",
+      "六五：贞吉，无悔。君子之光，有孚，吉。",
+      "上九：有孚于饮酒，无咎。濡其首，有孚失是。"
     ]
   }
 ];
