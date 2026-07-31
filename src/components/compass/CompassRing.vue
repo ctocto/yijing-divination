@@ -51,7 +51,6 @@ defineProps({
 const { state, rotation, setRotation, setState, completeSpin, palaceIndexAt } = useCompass()
 
 const dragging = ref(false)
-let startAngle = 0
 let startRotation = 0
 let lastPointerAngle = 0
 let lastTime = 0
@@ -71,9 +70,8 @@ function onPointerDown(e) {
   if (state.value === 'reading') return
   dragging.value = true
   e.currentTarget.setPointerCapture(e.pointerId)
-  startAngle = pointerAngle(e)
   startRotation = rotation.value
-  lastPointerAngle = startAngle
+  lastPointerAngle = pointerAngle(e)
   lastTime = performance.now()
   velocity = 0
   gestureTotal = 0

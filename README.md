@@ -1,5 +1,16 @@
-# Vue 3 + Vite
+# 易经占卜
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+单页罗盘交互的易经占卜应用：旋转罗盘出卦、浏览 64 卦、卷轴展示卦辞爻辞解读。
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## 技术栈
+
+Vue 3 + Vite + vue-router，纯 CSS/SVG，零 UI 依赖。
+
+## 命令
+
+```bash
+pnpm dev                          # 启动开发服务器
+pnpm build                        # 生产构建至 dist/
+pnpm preview                      # 预览生产构建
+node scripts/verify-hexagrams.mjs # 验证卦象数据完整性
+```

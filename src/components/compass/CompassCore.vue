@@ -12,7 +12,7 @@
       </g>
 
       <!-- 固定指针（不随旋转） -->
-      <path :d="pointerPath" :fill="theme.cinnabar" />
+      <path :d="pointerPath" :fill="theme.cinnabar" :class="{ 'pointer-flash': !!divinationResult }" />
 
       <!-- 中心太极（静止，双击回到闲观态） -->
       <g class="taiji-center" @dblclick="resetToIdle">
@@ -34,7 +34,7 @@ const SIZE = 720
 const C = SIZE / 2
 const DISC_RADIUS = 195
 
-const { state, rotation, clearSelection, resetToIdle } = useCompass()
+const { state, rotation, clearSelection, resetToIdle, divinationResult } = useCompass()
 
 // 朱砂指针：顶部倒三角，尖端指向盘面上缘（仅依赖模块级常量，非响应式）
 const pointerPath = `M ${C - 14} ${C - DISC_RADIUS - 42} L ${C + 14} ${C - DISC_RADIUS - 42} L ${C} ${C - DISC_RADIUS + 4} Z`
@@ -67,5 +67,13 @@ const pointerPath = `M ${C - 14} ${C - DISC_RADIUS - 42} L ${C + 14} ${C - DISC_
   left: 16px;
   transform: scale(0.2286);
   z-index: 10;
+}
+.pointer-flash {
+  animation: pointer-flash 0.4s ease 2;
+}
+@keyframes pointer-flash {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
 }
 </style>
