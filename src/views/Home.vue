@@ -1,27 +1,29 @@
 <template>
-  <div class="home">
-    <hexagram-chart @click="navigateToDivination" />
+  <div class="compass-page" :class="`state-${state}`">
+    <CompassCore />
+    <ResultScroll v-if="state === 'reading'" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import HexagramChart from '../components/HexagramChart.vue';
+import CompassCore from '../components/compass/CompassCore.vue'
+import ResultScroll from '../components/scroll/ResultScroll.vue'
+import { useCompass } from '../composables/useCompass'
 
-const router = useRouter();
-
-function navigateToDivination() {
-  router.push('/divination');
-}
+const { state } = useCompass()
 </script>
 
 <style scoped>
-.home {
+.compass-page {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-  font-family: 'SimSun', 'STSong', serif;
+  justify-content: center;
+  background-color: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+.compass-page.state-reading {
+  display: block;
 }
 </style>

@@ -1,17 +1,12 @@
 // 导入 Vue 和 Vue Router
 import { createRouter, createWebHistory } from 'vue-router';
 
-// 定义路由
+// 定义路由 —— 单页应用，罗盘承载全部功能
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: () => import('../views/Home.vue'),
-  },
-  {
-    path: '/divination',
-    name: 'Divination',
-    component: () => import('../views/Divination/HexagramDivination.vue'),
   },
 ];
 
