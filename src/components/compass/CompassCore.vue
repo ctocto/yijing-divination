@@ -23,7 +23,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import CompassRing from './CompassRing.vue'
 import ScaleRing from './ScaleRing.vue'
 import HexagramRing from './HexagramRing.vue'
@@ -37,43 +36,36 @@ const DISC_RADIUS = 195
 
 const { state, rotation, clearSelection, resetToIdle } = useCompass()
 
-// 朱砂指针：顶部倒三角，尖端指向盘面上缘
-const pointerPath = computed(() => {
-  const baseY = C - DISC_RADIUS
-  return `M ${C - 14} ${baseY - 42} L ${C + 14} ${baseY - 42} L ${C} ${baseY + 4} Z`
-})
+// 朱砂指针：顶部倒三角，尖端指向盘面上缘（仅依赖模块级常量，非响应式）
+const pointerPath = `M ${C - 14} ${C - DISC_RADIUS - 42} L ${C + 14} ${C - DISC_RADIUS - 42} L ${C} ${C - DISC_RADIUS + 4} Z`
 </script>
 
 <style scoped>
 .compass-core {
-  transition: transform 0.6s ease-out;
+  position: absolute;
+  width: 700px;
+  transform-origin: top left;
+  transition: top 0.6s ease-out, left 0.6s ease-out, transform 0.6s ease-out;
 }
 .compass-svg {
   display: block;
-  width: min(88vh, 88vw, 700px);
+  width: 100%;
   height: auto;
   user-select: none;
 }
 .taiji-center {
   cursor: default;
 }
-
-/* 闲观态 / 旋转态：居中 */
 .compass-core.state-idle,
 .compass-core.state-spinning {
-  transform: none;
+  top: calc(50% - 350px);
+  left: calc(50% - 350px);
+  transform: scale(1);
 }
-
-/* 阅读态：缩小滑至左上角 */
 .compass-core.state-reading {
-  position: absolute;
   top: 16px;
   left: 16px;
-  z-index: 10;
-}
-.compass-core.state-reading .compass-svg {
-  width: 700px;
   transform: scale(0.2286);
-  transform-origin: top left;
+  z-index: 10;
 }
 </style>
