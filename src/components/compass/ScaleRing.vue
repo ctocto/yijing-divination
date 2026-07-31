@@ -7,10 +7,10 @@
     <line
       v-for="i in 8"
       :key="`div-${i}`"
-      :x1="center + 218 * Math.cos(((i - 1) * 45 - 90) * Math.PI / 180)"
-      :y1="center + 218 * Math.sin(((i - 1) * 45 - 90) * Math.PI / 180)"
-      :x2="center + 285 * Math.cos(((i - 1) * 45 - 90) * Math.PI / 180)"
-      :y2="center + 285 * Math.sin(((i - 1) * 45 - 90) * Math.PI / 180)"
+      :x1="center + 218 * Math.cos(((i - 1) * 45 - 90 + 22.5) * Math.PI / 180)"
+      :y1="center + 218 * Math.sin(((i - 1) * 45 - 90 + 22.5) * Math.PI / 180)"
+      :x2="center + 285 * Math.cos(((i - 1) * 45 - 90 + 22.5) * Math.PI / 180)"
+      :y2="center + 285 * Math.sin(((i - 1) * 45 - 90 + 22.5) * Math.PI / 180)"
       :stroke="theme.goldLight"
       stroke-width="0.6"
     />
