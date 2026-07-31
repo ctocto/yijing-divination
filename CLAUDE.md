@@ -13,7 +13,7 @@ Package manager is **pnpm** (see `pnpm-lock.yaml`). There is no test or lint scr
 - `pnpm dev` — start the Vite dev server
 - `pnpm build` — production build to `dist/`
 - `pnpm preview` — serve the production build locally
-- `node scripts/verify-hexagrams.mjs` — verify hexagram data integrity (binary uniqueness, line counts, trigram decomposition)
+- `node scripts/verify-hexagrams.mjs` — verify hexagram data integrity (validates the 64 hexagrams: binary uniqueness and correct binary values)
 - Ad-hoc checks (ESLint + Prettier installed as devDependencies): `npx eslint .`, `npx prettier --check .`
 
 ## Architecture
@@ -26,7 +26,7 @@ Single-page app with one route in `src/router/index.js`: `/` loads `src/views/Ho
 - `src/data/hexagrams.js` holds all 64 hexagrams with records of shape `{ binary, name, text, lines[6] }`. All 64 entries are present with corrected `binary` values (previously many were wrong — now recomputed from trigram composition: lower trigram + upper trigram bits). Lookups are linear `Array.find` scans; misses fall back to `'未知卦'` / `'无卦辞信息'`.
 - `src/data/palaces.js` — the 八宫卦序 (Eight Palace hexagram order): 8 palaces, each with a name, trigram character, and list of 8 hexagram names. Used by the compass ring for directional attribution and by the spinning logic to pick a random hexagram from the pointed palace.
 - `src/data/trigrams.js` — annotations for the 八卦 (乾/兑/离/震/巽/坎/艮/坤): name, trigram, wuxing, direction, num, heavenlyStem, earthlyBranch, xiang.
-- `scripts/verify-hexagrams.mjs` — data integrity check: validates that all 64 binaries are unique, each has 6 lines, line distribution matches expected trigram compositions, and decimal values match the canonical King Wen ordering.
+- `scripts/verify-hexagrams.mjs` — validates data integrity: exactly 64 hexagrams, unique `binary` values, and each `binary` matching the authoritative per-name table.
 - `src/utils/divination.js` holds pure logic: `generateHexagram()`, `getHexagramName()`, `getHexagramText()`, `getLineTexts()`. Randomness is plain `Math.random()` — no yarrow-stalk/coin probabilities. This module is still on disk but currently unused by the compass-driven flow.
 
 ### State & composable
