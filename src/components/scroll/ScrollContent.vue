@@ -38,16 +38,22 @@
       <p class="colloquial-hint">{{ colloquialHint }}</p>
     </div>
 
-    <!-- 再起一卦 -->
-    <button class="restart-btn" @click="resetToIdle">再起一卦</button>
+    <!-- 操作：复制解读 / 再起一卦 -->
+    <div class="action-row">
+      <button class="copy-btn" type="button" @click="onCopy">{{ copied ? '已复制' : '复制解读' }}</button>
+      <button class="restart-btn" type="button" @click="resetToIdle">再起一卦</button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCompass } from '@/composables/useCompass'
+import { useCopy } from '@/composables/useCopy'
+import { buildHexagramText } from '@/utils/hexagramText'
 
 const { divinationResult, direction, resetToIdle } = useCompass()
+const { copied, copyText } = useCopy()
 
 const result = computed(() => divinationResult.value)
 const displayLines = computed(() => result.value?.binary.split('').reverse() || [])
@@ -71,6 +77,10 @@ const colloquialHint = computed(() => {
   }
   return direction.value ? `结合当前方向「${direction.value}」，${hint}` : hint
 })
+
+function onCopy() {
+  copyText(buildHexagramText(result.value, direction.value))
+}
 </script>
 
 <style scoped>
@@ -143,6 +153,27 @@ const colloquialHint = computed(() => {
   margin: 0;
   padding-top: 10px;
   border-top: 1px dashed var(--gold-light);
+}
+.action-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.copy-btn {
+  padding: 10px 24px;
+  font-size: 15px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  letter-spacing: 0.12em;
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+.copy-btn:hover {
+  color: var(--cinnabar);
+  border-color: var(--cinnabar);
+  background: rgba(178, 58, 46, 0.05);
 }
 .restart-btn {
   padding: 10px 28px;

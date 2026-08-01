@@ -14,6 +14,7 @@
           <span class="dot" />{{ line }}
         </li>
       </ul>
+      <button class="panel-copy" type="button" @click="onCopy">{{ copied ? '已复制' : '复制此卦' }}</button>
     </aside>
   </div>
 </template>
@@ -21,9 +22,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCompass } from '@/composables/useCompass'
+import { useCopy } from '@/composables/useCopy'
+import { buildHexagramText } from '@/utils/hexagramText'
 import { palaces } from '@/data/palaces'
 
 const { selectedHexagram, clearSelection } = useCompass()
+const { copied, copyText } = useCopy()
 
 const hexagram = computed(() => selectedHexagram.value)
 const palaceName = computed(() => {
@@ -31,6 +35,10 @@ const palaceName = computed(() => {
   const p = palaces.find(pal => pal.hexagrams.includes(hexagram.value.name))
   return p ? p.name : ''
 })
+
+function onCopy() {
+  copyText(buildHexagramText(hexagram.value))
+}
 </script>
 
 <style scoped>
@@ -124,6 +132,22 @@ const palaceName = computed(() => {
   border-radius: 50%;
   background: var(--cinnabar);
   align-self: center;
+}
+.panel-copy {
+  margin-top: 8px;
+  padding: 8px 22px;
+  font-size: 14px;
+  border: 1px solid var(--gold);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ink);
+  letter-spacing: 0.12em;
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+.panel-copy:hover {
+  color: var(--cinnabar);
+  border-color: var(--cinnabar);
+  background: rgba(178, 58, 46, 0.05);
 }
 @keyframes panel-in {
   from { transform: translateX(24px); opacity: 0; }
