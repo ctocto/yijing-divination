@@ -61,6 +61,7 @@ const pointerPath = `M ${C - 14} ${C - DISC_RADIUS - 42} L ${C + 14} ${C - DISC_
   letter-spacing: 0.2em;
   color: var(--cinnabar);
   white-space: nowrap;
+  pointer-events: none;
 }
 .compass-svg {
   display: block;

@@ -31,7 +31,7 @@
       dominant-baseline="middle"
       font-size="22"
       font-weight="bold"
-      :fill="theme.ink"
+      :fill="activeIdx === i ? theme.cinnabar : theme.ink"
       :class="{ 'palace-active': activeIdx === i }"
       style="font-family: 'Ma Shan Zheng', 'STKaiti', cursive;"
     >{{ palace.name }}</text>
@@ -152,7 +152,6 @@ onBeforeUnmount(() => cancelAnimationFrame(animFrame))
 
 <style scoped>
 .palace-active {
-  fill: var(--cinnabar);
   font-size: 26px;
 }
 </style>

@@ -135,7 +135,7 @@ const colloquialText = computed(() => {
 }
 .restart-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(192, 57, 43, 0.4);
+  box-shadow: 0 4px 16px rgba(178, 58, 46, 0.4);
 }
 .figure-line {
   stroke: var(--ink);

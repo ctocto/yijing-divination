@@ -74,8 +74,15 @@ export function useCompass() {
   }
 
   // 卦库浏览态开关
-  function openLibrary() { state.value = 'browse' }
-  function closeLibrary() { state.value = 'idle' }
+  function openLibrary() {
+    state.value = 'browse'
+    document.body.style.overflow = 'hidden'
+  }
+  function closeLibrary() {
+    state.value = 'idle'
+    document.body.style.overflow = ''
+    selectedHexagram.value = null
+  }
 
   return {
     state,
