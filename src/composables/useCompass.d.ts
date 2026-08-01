@@ -1,4 +1,4 @@
-export type CompassState = 'idle' | 'spinning' | 'reading'
+export type CompassState = 'idle' | 'spinning' | 'casting' | 'reading' | 'browse'
 
 export interface CompassStore {
   state: { value: CompassState }
@@ -8,13 +8,17 @@ export interface CompassStore {
   selectedDirection: { value: string }
   customDirection: { value: string }
   direction: { value: string }
+  currentPalaceName: { value: string }
   setRotation: (deg: number) => void
   setState: (s: CompassState) => void
   palaceIndexAt: (deg: number) => number
   completeSpin: () => void
+  castSpin: () => void
   selectHexagram: (h: object) => void
   clearSelection: () => void
   resetToIdle: () => void
+  openLibrary: () => void
+  closeLibrary: () => void
 }
 
 export function useCompass(): CompassStore
