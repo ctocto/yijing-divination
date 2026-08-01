@@ -53,6 +53,7 @@
             />
           </div>
           <button class="cast-btn" type="button" :disabled="state !== 'idle'" @click="drawHexagram">静 心 起 卦</button>
+          <button class="library-link" type="button" @click="showLibrary = true">浏览六十四卦 ▸</button>
           <p class="colophon">邵雍《皇极经世》· 六十四卦方位</p>
         </footer>
       </div>
@@ -61,6 +62,7 @@
     </div>
 
     <HexagramDetailPanel v-if="selectedHexagram" />
+    <HexagramLibrary v-if="showLibrary" @close="showLibrary = false" />
     <ResultScroll v-if="state === 'reading'" />
   </div>
 </template>
@@ -69,6 +71,7 @@
 import { computed, ref } from 'vue'
 import HexagramSquareCircle from '../components/chart/HexagramSquareCircle.vue'
 import HexagramDetailPanel from '../components/compass/HexagramDetailPanel.vue'
+import HexagramLibrary from '../components/compass/HexagramLibrary.vue'
 import ResultScroll from '../components/scroll/ResultScroll.vue'
 import { useCompass } from '../composables/useCompass'
 import { hexagrams } from '../data/hexagrams'
@@ -85,6 +88,7 @@ const {
 } = useCompass()
 
 const hoverName = ref('')
+const showLibrary = ref(false)
 
 // 注释条显示：优先悬停卦，其次选中卦
 const info = computed(() => {
@@ -304,6 +308,18 @@ function onSelect(name) {
   transform: none;
   box-shadow: none;
 }
+.library-link {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--ink-light);
+  background: none;
+  border: none;
+  border-bottom: 1px dashed var(--gold);
+  padding: 2px 2px;
+  letter-spacing: 0.12em;
+  transition: color 0.2s;
+}
+.library-link:hover { color: var(--cinnabar); }
 .colophon {
   font-size: 11px;
   letter-spacing: 0.3em;
