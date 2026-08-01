@@ -79,7 +79,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "000010",
+    "binary": "010000",
     "name": "师",
     "text": "贞，丈人吉，无咎。",
     "lines": [
@@ -92,7 +92,7 @@ export const hexagrams = [
     ]
   },
   {
-    "binary": "010000",
+    "binary": "000010",
     "name": "比",
     "text": "吉。原筮，元永贞，无咎。不宁方来，后夫凶。",
     "lines": [
