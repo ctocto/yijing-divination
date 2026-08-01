@@ -43,7 +43,7 @@ const pointerPath = `M ${C - 14} ${C - DISC_RADIUS - 42} L ${C + 14} ${C - DISC_
 <style scoped>
 .compass-core {
   position: absolute;
-  width: 700px;
+  width: min(92vmin, 700px);
   transform-origin: top left;
   transition: top 0.6s ease-out, left 0.6s ease-out, transform 0.6s ease-out;
 }
@@ -58,15 +58,24 @@ const pointerPath = `M ${C - 14} ${C - DISC_RADIUS - 42} L ${C + 14} ${C - DISC_
 }
 .compass-core.state-idle,
 .compass-core.state-spinning {
-  top: calc(50% - 350px);
-  left: calc(50% - 350px);
+  top: calc(50% - min(46vmin, 350px));
+  left: calc(50% - min(46vmin, 350px));
   transform: scale(1);
+}
+.compass-core.state-idle .compass-svg,
+.compass-core.state-spinning .compass-svg {
+  touch-action: none; /* 触摸拖盘时不触发页面滚动 */
 }
 .compass-core.state-reading {
   top: 16px;
   left: 16px;
   transform: scale(0.2286);
   z-index: 10;
+}
+@media (max-width: 600px) {
+  .compass-core.state-reading {
+    display: none; /* 移动端卷轴独占全屏，复位走「再起一卦」按钮 */
+  }
 }
 .pointer-flash {
   animation: pointer-flash 0.4s ease 2;

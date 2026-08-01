@@ -33,6 +33,16 @@ import ScrollContent from './ScrollContent.vue'
   padding: 48px 56px 56px;
   animation: scroll-unfold 0.8s ease-out;
 }
+@media (max-width: 600px) {
+  .result-scroll {
+    padding: 16px;
+  }
+  .scroll-sheet {
+    padding: 32px 20px 44px;
+    border-left-width: 6px;
+    border-right-width: 6px;
+  }
+}
 @keyframes scroll-unfold {
   from {
     clip-path: inset(0 0 100% 0);

@@ -4,23 +4,23 @@
     :class="{ highlighted, selected }"
     @click.stop="$emit('click')"
   >
-    <rect :x="x - 20" :y="y - 15" width="40" height="30" rx="5" class="glyph-bg" :stroke="theme.gold" stroke-width="0.8" />
+    <rect :x="x - 17" :y="y - 13" width="34" height="26" rx="5" class="glyph-bg" :stroke="theme.gold" stroke-width="0.8" />
     <text
       :x="x"
-      :y="y + 6"
+      :y="y + 7"
       text-anchor="middle"
       dominant-baseline="middle"
-      font-size="13"
+      font-size="11"
       font-weight="bold"
       class="glyph-name"
     >{{ hexagram.name }}</text>
     <!-- 迷你六爻线 -->
-    <g :transform="`translate(${x - 10}, ${y - 13})`">
-      <g v-for="(line, li) in displayLines" :key="li" :transform="`translate(0, ${li * 2.4})`">
-        <rect v-if="line === '1'" x="0" y="0" width="20" height="1.6" class="glyph-line" />
+    <g :transform="`translate(${x - 8}, ${y - 11})`">
+      <g v-for="(line, li) in displayLines" :key="li" :transform="`translate(0, ${li * 1.7})`">
+        <rect v-if="line === '1'" x="0" y="0" width="16" height="1.4" class="glyph-line" />
         <g v-else>
-          <rect x="0" y="0" width="8" height="1.6" class="glyph-line" />
-          <rect x="12" y="0" width="8" height="1.6" class="glyph-line" />
+          <rect x="0" y="0" width="6.5" height="1.4" class="glyph-line" />
+          <rect x="9.5" y="0" width="6.5" height="1.4" class="glyph-line" />
         </g>
       </g>
     </g>

@@ -44,18 +44,20 @@ const props = defineProps({
 
 const { state, selectedHexagram, divinationResult, selectHexagram, clearSelection } = useCompass()
 
-const R_OUTER = 330
-const R_INNER = 300
+const R_OUTER = 328
+const R_INNER = 285
 
 function hexagramByName(name) {
   return hexagrams.find(h => h.name === name)
 }
 
-// 宫位 pIdx 内第 hIdx 个卦的坐标：4 列 × 2 行
+// 宫位 pIdx 内第 hIdx 个卦的坐标：4 列 × 2 行，列间距 10°；内圈列错开半列 5°，
+// 避免内外圈同列卡片矩形在对角位置相碰
 function positionOf(pIdx, hIdx) {
   const col = hIdx % 4
   const row = Math.floor(hIdx / 4)
-  const angle = (pIdx * 45 - 90 + (col - 1.5) * 7) * Math.PI / 180
+  const colOffset = (col - 1.5) * 10 + (row === 1 ? 5 : 0)
+  const angle = (pIdx * 45 - 90 + colOffset) * Math.PI / 180
   const r = row === 0 ? R_OUTER : R_INNER
   return {
     x: props.center + r * Math.cos(angle),
