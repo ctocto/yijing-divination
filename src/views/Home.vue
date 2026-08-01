@@ -149,7 +149,11 @@ function onSelect(name) {
 /* —— 画框 —— */
 .frame {
   position: relative;
-  background: var(--scroll);
+  background:
+    /* 画框内底纹：浅回纹平铺 */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cg fill='none' stroke='%23604830' stroke-opacity='0.10' stroke-width='1.2'%3E%3Crect x='2.5' y='2.5' width='31' height='31'/%3E%3Crect x='12' y='12' width='12' height='12'/%3E%3C/g%3E%3C/svg%3E") repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 32%),
+    var(--scroll);
   border: 2px solid var(--gold);
   box-shadow: 0 12px 44px rgba(44, 36, 22, 0.22);
   padding: 6px 30px 24px;
