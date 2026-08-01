@@ -1,5 +1,8 @@
 <template>
   <div class="compass-core" :class="`state-${state}`">
+    <div v-if="state === 'spinning' || state === 'casting'" class="palace-name" aria-hidden="true">
+      {{ currentPalaceName }}
+    </div>
     <svg class="compass-svg" :viewBox="`0 0 ${SIZE} ${SIZE}`" @click.self="clearSelection">
       <!-- 外圈底色 -->
       <rect :x="4" :y="4" :width="SIZE - 8" :height="SIZE - 8" rx="20" fill="#fffdf6" :stroke="theme.gold" stroke-width="2" />
@@ -34,7 +37,7 @@ const SIZE = 720
 const C = SIZE / 2
 const DISC_RADIUS = 195
 
-const { state, rotation, clearSelection, resetToIdle, divinationResult } = useCompass()
+const { state, rotation, clearSelection, resetToIdle, divinationResult, currentPalaceName } = useCompass()
 
 // 朱砂指针：顶部倒三角，尖端指向盘面上缘（仅依赖模块级常量，非响应式）
 const pointerPath = `M ${C - 14} ${C - DISC_RADIUS - 42} L ${C + 14} ${C - DISC_RADIUS - 42} L ${C} ${C - DISC_RADIUS + 4} Z`
@@ -42,10 +45,22 @@ const pointerPath = `M ${C - 14} ${C - DISC_RADIUS - 42} L ${C + 14} ${C - DISC_
 
 <style scoped>
 .compass-core {
-  position: absolute;
-  width: min(92vmin, 700px);
+  position: relative;
+  width: min(78vmin, 620px);
   transform-origin: top left;
   transition: top 0.6s ease-out, left 0.6s ease-out, transform 0.6s ease-out;
+}
+.palace-name {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
+  font-size: 20px;
+  letter-spacing: 0.2em;
+  color: var(--cinnabar);
+  white-space: nowrap;
 }
 .compass-svg {
   display: block;
@@ -53,23 +68,24 @@ const pointerPath = `M ${C - 14} ${C - DISC_RADIUS - 42} L ${C + 14} ${C - DISC_
   height: auto;
   user-select: none;
 }
-.taiji-center {
-  cursor: default;
-}
+.taiji-center { cursor: default; }
 .compass-core.state-idle,
-.compass-core.state-spinning {
-  top: calc(50% - min(46vmin, 350px));
-  left: calc(50% - min(46vmin, 350px));
-  transform: scale(1);
+.compass-core.state-spinning,
+.compass-core.state-casting {
+  top: auto;
+  left: auto;
+  transform: none;
 }
 .compass-core.state-idle .compass-svg,
-.compass-core.state-spinning .compass-svg {
+.compass-core.state-spinning .compass-svg,
+.compass-core.state-casting .compass-svg {
   touch-action: none; /* 触摸拖盘时不触发页面滚动 */
 }
 .compass-core.state-reading {
+  position: fixed;
   top: 16px;
   left: 16px;
-  transform: scale(0.2286);
+  transform: scale(0.26);
   z-index: 10;
 }
 @media (max-width: 600px) {
