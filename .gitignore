@@ -26,3 +26,6 @@ dist-ssr
 
 # SDD 工作区（临时 scratch，不入库）
 .superpowers/
+
+# Claude 本地环境（设置与技能，不入库）
+.claude/
