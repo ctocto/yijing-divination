@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Vercel CLI 本地链接
+.vercel
 .vscode
 
 # Editor directories and files
