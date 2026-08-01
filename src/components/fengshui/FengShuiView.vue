@@ -129,7 +129,9 @@ const judges = computed(() => palaceJudges(pan.value, period.value));
 const overall = computed(() =>
   overallJudge(pan.value, shan.value, xiang.value, period.value)
 );
-const overallInfo = computed(() => overallJudgments[overall.value]);
+const overallInfo = computed(
+  () => overallJudgments[overall.value] || overallJudgments.ping
+);
 const special = computed(() => specialPositions(pan.value, period.value));
 const periodInfo = computed(() => {
   const p = yunPeriods.find((x) => x.period === period.value);
