@@ -53,10 +53,30 @@ const displayLines = computed(() => result.value?.binary.split('').reverse() || 
 
 const colloquialText = computed(() => {
   if (!result.value) return '——'
-  const name = result.value.name
-  const text = result.value.text
-  const dir = direction.value ? `结合当前方向「${direction.value}」` : '结合当前情况'
-  return `此卦为「${name}」，卦辞曰：${text}。${dir}，更需顺应时势、审时度势，从容应对。`
+  const { name, text, binary } = result.value
+  const yang = (binary.match(/1/g) || []).length
+  const yin = 6 - yang
+  // 依阴阳结构给出克制的指引，避免每卦雷同的套话
+  let structure, advice
+  if (yang === 6) {
+    structure = '六爻皆阳，纯阳之象'
+    advice = '其势刚健，行动宜果决而不失节制'
+  } else if (yang === 0) {
+    structure = '六爻皆阴，纯阴之象'
+    advice = '其性柔顺，宜守静安贞，顺时而动'
+  } else if (yang >= 4) {
+    structure = `阳盛阴弱（${yang} 阳 ${yin} 阴）`
+    advice = '阳刚为主，宜刚柔相济，勿过亢'
+  } else if (yang <= 2) {
+    structure = `阴盛阳微（${yang} 阳 ${yin} 阴）`
+    advice = '阴柔为主，宜守正待时，蓄势而发'
+  } else {
+    structure = `阴阳调和（${yang} 阳 ${yin} 阴）`
+    advice = '刚柔相济，动静相宜，顺其自然'
+  }
+  const cleanText = text.endsWith('。') ? text.slice(0, -1) : text
+  const dir = direction.value ? `结合当前方向「${direction.value}」` : '结合当下所问'
+  return `「${name}」卦，${structure}。卦辞曰：${cleanText}。${dir}，${advice}。`
 })
 </script>
 
