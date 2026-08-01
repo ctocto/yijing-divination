@@ -1,51 +1,248 @@
 <template>
-  <div class="home-page" :class="`state-${state}`">
-    <AppHeader @open-help="showHelp = true" />
-    <main class="compass-stage">
-      <CompassCore />
-    </main>
-    <CastBar v-if="state !== 'reading' && state !== 'browse'" />
+  <div class="poster-page" :class="`state-${state}`">
+    <div class="poster">
+      <div class="rod rod-top" />
 
-    <HowToOverlay v-if="showHelp" @close="showHelp = false" />
+      <div class="frame">
+        <span class="corner corner-tl" /><span class="corner corner-tr" />
+        <span class="corner corner-bl" /><span class="corner corner-br" />
+
+        <header class="poster-header">
+          <h1 class="title">周易</h1>
+          <p class="subtitle">六十四卦方圆图 · 伏羲</p>
+          <span class="seal">易</span>
+        </header>
+
+        <div class="chart-wrap">
+          <HexagramSquareCircle
+            :selected="selectedHexagram?.name || ''"
+            :cast-name="divinationResult?.name || ''"
+            :casting="state === 'casting'"
+            @hover="hoverName = $event"
+            @select="onSelect"
+          />
+        </div>
+
+        <div class="info-bar">
+          <template v-if="info">
+            <span class="info-name">{{ info.name }}</span>
+            <span class="info-text">{{ info.text }}</span>
+          </template>
+          <span v-else class="info-hint">悬停或点击卦象查看释义 · 静心起卦得卦</span>
+        </div>
+
+        <footer class="poster-footer">
+          <button class="cast-btn" type="button" @click="drawHexagram">静 心 起 卦</button>
+          <p class="colophon">邵雍《皇极经世》· 六十四卦方位</p>
+        </footer>
+      </div>
+
+      <div class="rod rod-bottom" />
+    </div>
+
     <HexagramDetailPanel v-if="selectedHexagram" />
-    <HexagramLibrary v-if="state === 'browse'" />
     <ResultScroll v-if="state === 'reading'" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import AppHeader from '../components/layout/AppHeader.vue'
-import CastBar from '../components/layout/CastBar.vue'
-import HowToOverlay from '../components/layout/HowToOverlay.vue'
-import CompassCore from '../components/compass/CompassCore.vue'
+import { computed, ref } from 'vue'
+import HexagramSquareCircle from '../components/chart/HexagramSquareCircle.vue'
 import HexagramDetailPanel from '../components/compass/HexagramDetailPanel.vue'
-import HexagramLibrary from '../components/compass/HexagramLibrary.vue'
 import ResultScroll from '../components/scroll/ResultScroll.vue'
 import { useCompass } from '../composables/useCompass'
+import { hexagrams } from '../data/hexagrams'
 
-const { state, selectedHexagram } = useCompass()
-const showHelp = ref(false)
+const { state, selectedHexagram, divinationResult, drawHexagram, selectHexagram, clearSelection } =
+  useCompass()
+
+const hoverName = ref('')
+
+// 注释条显示：优先悬停卦，其次选中卦
+const info = computed(() => {
+  const name = hoverName.value || selectedHexagram.value?.name || ''
+  return hexagrams.find(h => h.name === name) || null
+})
+
+function onSelect(name) {
+  const h = hexagrams.find(x => x.name === name)
+  if (!h) return
+  if (selectedHexagram.value?.name === name) clearSelection()
+  else selectHexagram(h)
+}
 </script>
 
 <style scoped>
-.home-page {
+.poster-page {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--paper);
-  position: relative;
-  overflow: hidden;
-}
-.compass-stage {
-  flex: 1;
-  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 28px 20px;
+  position: relative;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 253, 246, 0.85) 0%, rgba(44, 36, 22, 0.05) 78%),
+    var(--paper);
 }
-/* 阅读态：CastBar 隐藏、罗盘 fixed 左上角，页面恢复块布局承载卷轴 */
-.home-page.state-reading {
+
+/* —— 挂轴 —— */
+.poster {
+  position: relative;
+  width: min(94vw, 860px);
+}
+.rod {
+  height: 16px;
+  margin: 0 -14px;
+  border-radius: 5px;
+  background: linear-gradient(to bottom, #54422e, #2c2214 45%, #3b2d1d 80%, #1f180e);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.rod-top { margin-bottom: -2px; }
+.rod-bottom { margin-top: -2px; }
+
+/* —— 画框 —— */
+.frame {
+  position: relative;
+  background: var(--scroll);
+  border: 2px solid var(--gold);
+  box-shadow: 0 12px 44px rgba(44, 36, 22, 0.22);
+  padding: 6px 30px 24px;
+}
+.corner {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--gold);
+  z-index: 2;
+}
+.corner-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.corner-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+.corner-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+.corner-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+/* —— 标题区 —— */
+.poster-header {
+  position: relative;
+  text-align: center;
+  padding: 24px 0 6px;
+}
+.title {
+  font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
+  font-size: 54px;
+  margin: 0;
+  color: var(--deep-ink);
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+}
+.subtitle {
+  font-size: 13px;
+  color: var(--ink-light);
+  letter-spacing: 0.42em;
+  margin: 4px 0 0;
+}
+.seal {
+  position: absolute;
+  top: 18px;
+  right: 10px;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cinnabar);
+  color: #faf3e8;
+  font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
+  font-size: 28px;
+  border-radius: 4px;
+  transform: rotate(4deg);
+  box-shadow: 0 2px 8px rgba(178, 58, 46, 0.45);
+}
+
+/* —— 卦图 —— */
+.chart-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+.chart-wrap :deep(svg) {
+  width: min(78vw, 560px);
+  height: auto;
   display: block;
+}
+
+/* —— 注释条 —— */
+.info-bar {
+  max-width: 560px;
+  min-height: 54px;
+  margin: 10px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 18px;
+  border-top: 1px solid var(--gold-light);
+  border-bottom: 1px solid var(--gold-light);
+  text-align: center;
+}
+.info-name {
+  flex: none;
+  font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
+  font-size: 26px;
+  color: var(--cinnabar);
+}
+.info-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.info-hint {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: var(--ink-light);
+}
+
+/* —— 落款与起卦 —— */
+.poster-footer {
+  text-align: center;
+  padding: 16px 0 8px;
+}
+.cast-btn {
+  font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
+  font-size: 20px;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  padding: 12px 46px;
+  color: #faf3e8;
+  background: var(--cinnabar);
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 4px 16px rgba(178, 58, 46, 0.4);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.cast-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 22px rgba(178, 58, 46, 0.5);
+}
+.colophon {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--ink-light);
+  margin: 14px 0 0;
+}
+
+/* —— 阅读态：挂图退后 —— */
+.poster-page.state-reading .poster {
+  filter: blur(2px) brightness(0.92);
+  transition: filter 0.4s;
+}
+
+@media (max-width: 600px) {
+  .poster-page { padding: 16px 10px; }
+  .frame { padding: 4px 14px 18px; }
+  .title { font-size: 38px; }
+  .seal { width: 36px; height: 36px; font-size: 21px; right: 4px; top: 14px; }
+  .chart-wrap :deep(svg) { width: 88vw; }
+  .info-bar { min-height: 46px; gap: 8px; padding: 8px 10px; }
+  .info-name { font-size: 22px; }
 }
 </style>

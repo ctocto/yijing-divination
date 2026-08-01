@@ -18,7 +18,7 @@ import ScrollContent from './ScrollContent.vue'
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 32px 32px 32px 208px; /* 给左上角缩小罗盘留位 */
+  padding: 32px;
 }
 .scroll-sheet {
   width: 100%;

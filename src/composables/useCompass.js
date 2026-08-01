@@ -1,14 +1,13 @@
 import { ref, computed } from 'vue'
 import { hexagrams } from '@/data/hexagrams'
-import { palaces } from '@/data/palaces'
 
 // 模块级单例状态 —— 所有调用 useCompass() 的组件共享同一组 ref
-const state = ref('idle')          // 'idle' | 'spinning' | 'casting' | 'reading' | 'browse'
-const rotation = ref(0)            // 当前旋转角度（度，可连续累计）
+const state = ref('idle')          // 'idle' | 'casting' | 'reading'
 const selectedHexagram = ref(null) // 点击浏览的卦象
-const divinationResult = ref(null) // 占卜结果卦象对象
+const divinationResult = ref(null) // 起卦结果卦象对象
 const selectedDirection = ref('')  // 方向下拉框
 const customDirection = ref('')    // 自定义方向输入
+let castTimer = null               // 起卦后进入阅读态前的高亮时长
 
 export function useCompass() {
   const direction = computed(() =>
@@ -17,48 +16,9 @@ export function useCompass() {
       : selectedDirection.value
   )
 
-  function setRotation(deg) { rotation.value = deg }
-  function setState(s) { state.value = s }
-
-  // 指针固定正上方（12 点方向）。宫位 i 中心角 = -90 + i*45；
-  // 旋转 r 后指针所指宫位满足 (-90 + i*45 + r) ≡ -90 (mod 360) → i*45 ≡ -r
-  function palaceIndexAt(deg) {
-    const norm = ((deg % 360) + 360) % 360
-    return Math.round(((360 - norm) % 360) / 45) % 8
-  }
-
-  // 旋转中指针实时所指宫位名
-  const currentPalaceName = computed(() => palaces[palaceIndexAt(rotation.value)].name)
-
-  // 旋转完全停止后调用：按指针宫位随机取一卦，进入阅读态
-  function completeSpin() {
-    const palace = palaces[palaceIndexAt(rotation.value)]
-    const name = palace.hexagrams[Math.floor(Math.random() * palace.hexagrams.length)]
-    divinationResult.value = hexagrams.find(h => h.name === name) || null
-    selectedHexagram.value = null
-    state.value = 'reading'
-  }
-
-  // 点按起卦：罗盘自动旋转 2~3 圈（约 2.5s）后出卦
-  function castSpin() {
-    if (state.value !== 'idle') return
-    state.value = 'casting'
-    const start = rotation.value
-    const total = 720 + Math.random() * 360   // 2~3 圈
-    const duration = 2500                      // ms
-    const t0 = performance.now()
-    const step = (t) => {
-      const p = Math.min(1, (t - t0) / duration)
-      setRotation(start + total * (1 - Math.pow(1 - p, 3))) // ease-out cubic
-      if (p < 1) requestAnimationFrame(step)
-      else completeSpin()
-    }
-    requestAnimationFrame(step)
-  }
-
   // 闲观态下点击卦符 → 浏览模式
   function selectHexagram(hexagram) {
-    if (state.value !== 'idle' && state.value !== 'browse') return
+    if (state.value !== 'idle') return
     selectedHexagram.value = hexagram
   }
 
@@ -66,42 +26,35 @@ export function useCompass() {
     selectedHexagram.value = null
   }
 
+  // 起卦：均匀随机抽一卦，先点亮（casting）再展开结果（reading）
+  function drawHexagram() {
+    if (state.value !== 'idle') return
+    const name = hexagrams[Math.floor(Math.random() * hexagrams.length)].name
+    divinationResult.value = hexagrams.find(h => h.name === name) || null
+    selectedHexagram.value = null
+    state.value = 'casting'
+    clearTimeout(castTimer)
+    castTimer = setTimeout(() => { state.value = 'reading' }, 900)
+  }
+
   // 阅读态 → 闲观态
   function resetToIdle() {
+    clearTimeout(castTimer)
     state.value = 'idle'
     divinationResult.value = null
     selectedHexagram.value = null
   }
 
-  // 卦库浏览态开关
-  function openLibrary() {
-    state.value = 'browse'
-    document.body.style.overflow = 'hidden'
-  }
-  function closeLibrary() {
-    state.value = 'idle'
-    document.body.style.overflow = ''
-    selectedHexagram.value = null
-  }
-
   return {
     state,
-    rotation,
     selectedHexagram,
     divinationResult,
     selectedDirection,
     customDirection,
     direction,
-    currentPalaceName,
-    setRotation,
-    setState,
-    palaceIndexAt,
-    completeSpin,
-    castSpin,
+    drawHexagram,
     selectHexagram,
     clearSelection,
     resetToIdle,
-    openLibrary,
-    closeLibrary,
   }
 }
