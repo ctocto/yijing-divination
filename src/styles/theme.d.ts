@@ -1,5 +1,6 @@
 export const theme: {
   paper: string
+  deepInk: string
   ink: string
   inkLight: string
   cinnabar: string
