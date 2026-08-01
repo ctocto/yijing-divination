@@ -1,5 +1,6 @@
 // 玄空飞星纯逻辑（不触碰 DOM，node 脚本可直接 import 校验）
 import { mountains } from '../data/luopan.js';
+import { stars } from '../data/flyingStars.js';
 
 // 宫位：3×3 盘面按行展开（南在上）
 export const PALACES = ['巽', '离', '坤', '震', '中', '兑', '艮', '坎', '乾'];
@@ -87,4 +88,80 @@ export function xiangPan(xiang, yun) {
 export function buildPan(shan, xiang, period) {
   const yun = yunPan(period);
   return { yun, shan: shanPan(shan, yun), xiang: xiangPan(xiang, yun) };
+}
+
+// 大局判断：按当运旺星落点四象限 + 伏吟/反吟
+export function overallJudge(pan, shan, xiang, period) {
+  const shanPalace = mtn(shan).palace;
+  const xiangPalace = mtn(xiang).palace;
+  const findStar = (which, star) =>
+    Object.keys(pan[which]).find((k) => pan[which][k] === star);
+  const shanStarPalace = findStar('shan', period);
+  const xiangStarPalace = findStar('xiang', period);
+  const atShan = (p) => p === shanPalace;
+  const atXiang = (p) => p === xiangPalace;
+  if (atShan(shanStarPalace) && atXiang(xiangStarPalace)) return 'wangshan';
+  if (atXiang(shanStarPalace) && atShan(xiangStarPalace)) return 'shangshan';
+  if (atXiang(shanStarPalace) && atXiang(xiangStarPalace)) return 'shuangXiang';
+  if (atShan(shanStarPalace) && atShan(xiangStarPalace)) return 'shuangShan';
+  // 伏吟：星与宫同数；反吟：星与宫数合十
+  const fu = PALACES.find(
+    (p) => pan.shan[p] === PALACE_NUM[p] || pan.xiang[p] === PALACE_NUM[p]
+  );
+  if (fu) return 'fuyin';
+  const fan = PALACES.find(
+    (p) =>
+      pan.shan[p] + PALACE_NUM[p] === 10 || pan.xiang[p] + PALACE_NUM[p] === 10
+  );
+  if (fan) return 'fanyin';
+  return 'ping';
+}
+
+// 特殊位：财位（向盘当运旺星或生气星所到宫）、文昌（运盘四绿）、病符（运盘二黑）、五黄煞（运盘五黄）
+export function specialPositions(pan, period) {
+  const shengQi = (period % 9) + 1;
+  const findStar = (which, star) =>
+    Object.keys(pan[which]).find((k) => pan[which][k] === star);
+  return {
+    cai: findStar('xiang', period) || findStar('xiang', shengQi),
+    wen: findStar('yun', 4),
+    bing: findStar('yun', 2),
+    sha: findStar('yun', 5),
+  };
+}
+
+// 每宫断语：档位 + 主星当运/失令文案
+export function palaceJudges(pan, period) {
+  const shengQi = (period % 9) + 1;
+  return PALACES.map((palace) => {
+    const y = pan.yun[palace];
+    const s = pan.shan[palace];
+    const x = pan.xiang[palace];
+    let level;
+    if (s === 5 || x === 5) level = '煞';
+    else if (s === period || x === period) level = '旺';
+    else if (s === shengQi || x === shengQi) level = '吉';
+    else if (s === 2 || x === 2) level = '凶';
+    else level = '平';
+    const pick =
+      level === '煞'
+        ? 5
+        : level === '旺'
+          ? period
+          : level === '吉'
+            ? shengQi
+            : level === '凶'
+              ? 2
+              : x;
+    const info = stars.find((v) => v.star === pick);
+    const isDang = pick === period || pick === shengQi;
+    return {
+      palace,
+      yun: y,
+      shan: s,
+      xiang: x,
+      level,
+      brief: isDang ? info.dangYun : info.shiLing,
+    };
+  });
 }

@@ -23,3 +23,25 @@ export function xiangPan(
   yun: Record<string, number>
 ): Record<string, number>;
 export function buildPan(shan: string, xiang: string, period: number): Pan;
+export interface PalaceJudge {
+  palace: string;
+  yun: number;
+  shan: number;
+  xiang: number;
+  level: '旺' | '吉' | '平' | '凶' | '煞';
+  brief: string;
+}
+export interface SpecialMap {
+  cai?: string;
+  wen?: string;
+  bing?: string;
+  sha?: string;
+}
+export function overallJudge(
+  pan: Pan,
+  shan: string,
+  xiang: string,
+  period: number
+): string;
+export function specialPositions(pan: Pan, period: number): SpecialMap;
+export function palaceJudges(pan: Pan, period: number): PalaceJudge[];
