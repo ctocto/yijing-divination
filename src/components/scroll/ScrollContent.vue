@@ -1,27 +1,5 @@
 <template>
   <div class="scroll-content">
-    <!-- 方向选择 -->
-    <div class="direction-row">
-      <label for="scroll-direction">所问何事：</label>
-      <select id="scroll-direction" v-model="selectedDirection">
-        <option value="">无方向（开放问题）</option>
-        <option value="事业">事业</option>
-        <option value="情感">情感</option>
-        <option value="健康">健康</option>
-        <option value="学业">学业</option>
-        <option value="财富">财富</option>
-        <option value="家庭">家庭</option>
-        <option value="其他">其他（请填写下方）</option>
-      </select>
-      <input
-        v-if="selectedDirection === '其他'"
-        v-model="customDirection"
-        type="text"
-        placeholder="请输入自定义方向"
-        class="direction-input"
-      />
-    </div>
-
     <!-- 卦符图：六爻线 -->
     <div class="hexagram-figure">
       <svg viewBox="0 0 80 160" width="80" height="160">
@@ -68,7 +46,7 @@
 import { computed } from 'vue'
 import { useCompass } from '@/composables/useCompass'
 
-const { divinationResult, selectedDirection, customDirection, direction, resetToIdle } = useCompass()
+const { divinationResult, direction, resetToIdle } = useCompass()
 
 const result = computed(() => divinationResult.value)
 const displayLines = computed(() => result.value?.binary.split('').reverse() || [])
@@ -87,39 +65,19 @@ const colloquialText = computed(() => {
   text-align: center;
   color: var(--ink);
 }
-.direction-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 28px;
-  font-size: 14px;
-}
-.direction-row select,
-.direction-input {
-  padding: 6px 10px;
-  font-size: 14px;
-  border: 1px solid var(--gold);
-  border-radius: 4px;
-  background: #fffdf6;
-  color: var(--ink);
-}
-.direction-input { width: 150px; }
-
 .hexagram-figure { margin: 8px auto 4px; }
 
 .hexagram-name {
   font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
-  font-size: 48px;
+  font-size: 44px;
   color: var(--cinnabar);
-  margin: 12px 0 8px;
+  margin: 12px 0 10px;
 }
 .hexagram-text {
-  font-size: 18px;
+  font-size: 17px;
+  line-height: 2;
   color: var(--ink);
-  margin: 0 0 24px;
-  line-height: 1.9;
+  margin: 0 0 28px;
 }
 .line-texts {
   text-align: left;
