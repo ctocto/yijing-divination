@@ -34,7 +34,8 @@
     <!-- 白话解读 -->
     <div class="colloquial">
       <h3>白话解读</h3>
-      <p>{{ colloquialText }}</p>
+      <p class="colloquial-plain">{{ result?.plain }}</p>
+      <p class="colloquial-hint">{{ colloquialHint }}</p>
     </div>
 
     <!-- 再起一卦 -->
@@ -51,32 +52,24 @@ const { divinationResult, direction, resetToIdle } = useCompass()
 const result = computed(() => divinationResult.value)
 const displayLines = computed(() => result.value?.binary.split('').reverse() || [])
 
-const colloquialText = computed(() => {
-  if (!result.value) return '——'
-  const { name, text, binary } = result.value
+// 依阴阳结构给一句大白话提示
+const colloquialHint = computed(() => {
+  if (!result.value) return ''
+  const binary = result.value.binary
   const yang = (binary.match(/1/g) || []).length
-  const yin = 6 - yang
-  // 依阴阳结构给出克制的指引，避免每卦雷同的套话
-  let structure, advice
+  let hint
   if (yang === 6) {
-    structure = '六爻皆阳，纯阳之象'
-    advice = '其势刚健，行动宜果决而不失节制'
+    hint = '六爻皆阳，气势刚健——做事可以果断些，但别太过张扬'
   } else if (yang === 0) {
-    structure = '六爻皆阴，纯阴之象'
-    advice = '其性柔顺，宜守静安贞，顺时而动'
+    hint = '六爻皆阴，性情柔顺——宜脚踏实地、顺势而为，不宜争先'
   } else if (yang >= 4) {
-    structure = `阳盛阴弱（${yang} 阳 ${yin} 阴）`
-    advice = '阳刚为主，宜刚柔相济，勿过亢'
+    hint = '阳多阴少，刚劲为主——做事要有冲劲，但记得刚柔相济、别用力过猛'
   } else if (yang <= 2) {
-    structure = `阴盛阳微（${yang} 阳 ${yin} 阴）`
-    advice = '阴柔为主，宜守正待时，蓄势而发'
+    hint = '阴多阳少，力量内敛——宜稳住、积蓄、等待时机，不必急着冒进'
   } else {
-    structure = `阴阳调和（${yang} 阳 ${yin} 阴）`
-    advice = '刚柔相济，动静相宜，顺其自然'
+    hint = '阴阳均衡，动静相宜——顺其自然、按部就班即可'
   }
-  const cleanText = text.endsWith('。') ? text.slice(0, -1) : text
-  const dir = direction.value ? `结合当前方向「${direction.value}」` : '结合当下所问'
-  return `「${name}」卦，${structure}。卦辞曰：${cleanText}。${dir}，${advice}。`
+  return direction.value ? `${hint}。结合当前方向「${direction.value}」` : hint
 })
 </script>
 
@@ -137,11 +130,19 @@ const colloquialText = computed(() => {
   color: var(--cinnabar);
   margin: 0 0 8px;
 }
-.colloquial p {
-  font-size: 14px;
+.colloquial-plain {
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.9;
+  margin: 0 0 10px;
+}
+.colloquial-hint {
+  font-size: 13px;
   color: var(--ink-light);
-  line-height: 1.8;
+  line-height: 1.7;
   margin: 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--gold-light);
 }
 .restart-btn {
   padding: 10px 28px;
