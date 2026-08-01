@@ -110,24 +110,25 @@ function onSelect(name) {
   position: relative;
   overflow: hidden;
   background:
+    /* 回纹底纹：四边回字格平铺 */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='none' stroke='%232c2416' stroke-opacity='0.12' stroke-width='1.3'%3E%3Crect x='3' y='3' width='38' height='38'/%3E%3Crect x='14' y='14' width='16' height='16'/%3E%3C/g%3E%3C/svg%3E") repeat,
+    /* 墨晕 */
     radial-gradient(140% 100% at 12% 8%, rgba(255, 252, 242, 0.95) 0%, transparent 55%),
-    radial-gradient(120% 90% at 88% 92%, rgba(178, 58, 46, 0.07) 0%, transparent 55%),
-    radial-gradient(90% 80% at 82% 10%, rgba(44, 36, 22, 0.06) 0%, transparent 62%),
-    radial-gradient(70% 70% at 6% 90%, rgba(168, 135, 58, 0.07) 0%, transparent 55%),
+    radial-gradient(120% 90% at 88% 92%, rgba(178, 58, 46, 0.11) 0%, transparent 55%),
+    radial-gradient(90% 80% at 82% 10%, rgba(44, 36, 22, 0.09) 0%, transparent 62%),
+    radial-gradient(70% 70% at 6% 90%, rgba(168, 135, 58, 0.10) 0%, transparent 55%),
     linear-gradient(180deg, #f9f4ea 0%, #efe7d6 100%);
 }
-/* 纸织纹理：极淡斜向细纹，营造宣纸手工质感 */
+/* 菱格编织纹理：斜向交叉细纹，清晰的宣纸编织底纹 */
 .poster-page::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.7;
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(44, 36, 22, 0.02) 0 1px,
-    transparent 1px 16px
-  );
+  opacity: 0.85;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(44, 36, 22, 0.05) 0 1.5px, transparent 1.5px 22px),
+    repeating-linear-gradient(-45deg, rgba(44, 36, 22, 0.05) 0 1.5px, transparent 1.5px 22px);
 }
 
 /* —— 挂轴 —— */
