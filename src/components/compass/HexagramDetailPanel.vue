@@ -6,6 +6,8 @@
       <p class="panel-palace">{{ palaceName }}</p>
       <h3 class="panel-section-title">卦辞</h3>
       <p class="panel-text">{{ hexagram?.text }}</p>
+      <h3 class="panel-section-title">白话释义</h3>
+      <p class="panel-plain">{{ hexagram?.plain }}</p>
       <h3 class="panel-section-title">爻辞</h3>
       <ul class="panel-lines">
         <li v-for="(line, i) in hexagram?.lines || []" :key="i" class="panel-line">
@@ -91,6 +93,12 @@ const palaceName = computed(() => {
 }
 .panel-text {
   font-size: 16px;
+  line-height: 1.9;
+  color: var(--ink);
+  margin: 0 0 24px;
+}
+.panel-plain {
+  font-size: 15px;
   line-height: 1.9;
   color: var(--ink);
   margin: 0 0 24px;

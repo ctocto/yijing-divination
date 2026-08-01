@@ -26,7 +26,7 @@
         <div class="info-bar">
           <template v-if="info">
             <span class="info-name">{{ info.name }}</span>
-            <span class="info-text">{{ info.text }}</span>
+            <span class="info-text">{{ info.plain }}</span>
           </template>
           <span v-else class="info-hint">悬停或点击卦象查看释义 · 静心起卦得卦</span>
         </div>
@@ -52,7 +52,7 @@
               class="direction-input"
             />
           </div>
-          <button class="cast-btn" type="button" @click="drawHexagram">静 心 起 卦</button>
+          <button class="cast-btn" type="button" :disabled="state !== 'idle'" @click="drawHexagram">静 心 起 卦</button>
           <p class="colophon">邵雍《皇极经世》· 六十四卦方位</p>
         </footer>
       </div>
@@ -244,6 +244,10 @@ function onSelect(name) {
   font-size: 14px;
   line-height: 1.7;
   color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .info-hint {
   font-size: 13px;
@@ -293,6 +297,12 @@ function onSelect(name) {
 .cast-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 22px rgba(178, 58, 46, 0.5);
+}
+.cast-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
 }
 .colophon {
   font-size: 11px;
