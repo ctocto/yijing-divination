@@ -32,6 +32,26 @@
         </div>
 
         <footer class="poster-footer">
+          <div class="direction-row">
+            <label for="cast-direction">所问何事</label>
+            <select id="cast-direction" v-model="selectedDirection">
+              <option value="">无方向（开放问题）</option>
+              <option>事业</option>
+              <option>情感</option>
+              <option>健康</option>
+              <option>学业</option>
+              <option>财富</option>
+              <option>家庭</option>
+              <option value="其他">其他</option>
+            </select>
+            <input
+              v-if="selectedDirection === '其他'"
+              v-model="customDirection"
+              type="text"
+              placeholder="请输入所问之事"
+              class="direction-input"
+            />
+          </div>
           <button class="cast-btn" type="button" @click="drawHexagram">静 心 起 卦</button>
           <p class="colophon">邵雍《皇极经世》· 六十四卦方位</p>
         </footer>
@@ -53,8 +73,16 @@ import ResultScroll from '../components/scroll/ResultScroll.vue'
 import { useCompass } from '../composables/useCompass'
 import { hexagrams } from '../data/hexagrams'
 
-const { state, selectedHexagram, divinationResult, drawHexagram, selectHexagram, clearSelection } =
-  useCompass()
+const {
+  state,
+  selectedHexagram,
+  divinationResult,
+  selectedDirection,
+  customDirection,
+  drawHexagram,
+  selectHexagram,
+  clearSelection,
+} = useCompass()
 
 const hoverName = ref('')
 
@@ -80,9 +108,26 @@ function onSelect(name) {
   justify-content: center;
   padding: 28px 20px;
   position: relative;
+  overflow: hidden;
   background:
-    radial-gradient(ellipse at center, rgba(255, 253, 246, 0.85) 0%, rgba(44, 36, 22, 0.05) 78%),
-    var(--paper);
+    radial-gradient(140% 100% at 12% 8%, rgba(255, 252, 242, 0.95) 0%, transparent 55%),
+    radial-gradient(120% 90% at 88% 92%, rgba(178, 58, 46, 0.07) 0%, transparent 55%),
+    radial-gradient(90% 80% at 82% 10%, rgba(44, 36, 22, 0.06) 0%, transparent 62%),
+    radial-gradient(70% 70% at 6% 90%, rgba(168, 135, 58, 0.07) 0%, transparent 55%),
+    linear-gradient(180deg, #f9f4ea 0%, #efe7d6 100%);
+}
+/* 纸织纹理：极淡斜向细纹，营造宣纸手工质感 */
+.poster-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.7;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(44, 36, 22, 0.02) 0 1px,
+    transparent 1px 16px
+  );
 }
 
 /* —— 挂轴 —— */
@@ -201,11 +246,32 @@ function onSelect(name) {
   color: var(--ink-light);
 }
 
-/* —— 落款与起卦 —— */
+/* —— 方向选择与起卦 —— */
 .poster-footer {
   text-align: center;
   padding: 16px 0 8px;
 }
+.direction-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: var(--ink-light);
+  margin-bottom: 14px;
+}
+.direction-row select,
+.direction-input {
+  padding: 7px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  background: #fffdf6;
+  color: var(--ink);
+}
+.direction-input { width: 180px; }
 .cast-btn {
   font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
   font-size: 20px;
