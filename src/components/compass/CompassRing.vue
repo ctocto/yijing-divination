@@ -32,13 +32,14 @@
       font-size="22"
       font-weight="bold"
       :fill="theme.ink"
+      :class="{ 'palace-active': activeIdx === i }"
       style="font-family: 'Ma Shan Zheng', 'STKaiti', cursive;"
     >{{ palace.name }}</text>
   </g>
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeUnmount } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { palaces } from '@/data/palaces'
 import { theme } from '@/styles/theme'
 import { useCompass } from '@/composables/useCompass'
@@ -49,6 +50,14 @@ defineProps({
 })
 
 const { state, rotation, setRotation, setState, completeSpin, palaceIndexAt } = useCompass()
+
+// 旋转中实时高亮指针所向宫位（闲观/阅读态不启用）
+const activeIdx = computed(() => {
+  if (state.value === 'spinning' || state.value === 'casting') {
+    return palaceIndexAt(rotation.value)
+  }
+  return -1
+})
 
 const dragging = ref(false)
 let startRotation = 0
@@ -67,7 +76,7 @@ function pointerAngle(e) {
 }
 
 function onPointerDown(e) {
-  if (state.value === 'reading') return
+  if (state.value === 'reading' || state.value === 'casting' || state.value === 'browse') return
   dragging.value = true
   e.currentTarget.setPointerCapture(e.pointerId)
   startRotation = rotation.value
@@ -140,3 +149,10 @@ function snapToPalace() {
 
 onBeforeUnmount(() => cancelAnimationFrame(animFrame))
 </script>
+
+<style scoped>
+.palace-active {
+  fill: var(--cinnabar);
+  font-size: 26px;
+}
+</style>
