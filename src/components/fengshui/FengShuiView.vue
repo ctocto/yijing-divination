@@ -49,6 +49,40 @@
         </div>
         <p class="period-range">{{ periodInfo }}</p>
 
+        <div v-if="compassSupported" class="compass-row">
+          <button
+            type="button"
+            class="compass-btn"
+            :disabled="compassState === 'running'"
+            @click="startCompass"
+          >
+            🧭 手机朝向对准
+          </button>
+          <template v-if="compassState === 'running'">
+            <span class="compass-live">
+              {{
+                compassHeading === null
+                  ? '转动手机获取方向…'
+                  : `当前指向 ${liveName}（${Math.round(compassHeading)}°）`
+              }}
+            </span>
+            <button
+              type="button"
+              class="compass-btn"
+              :disabled="compassHeading === null"
+              @click="lockCompass"
+            >
+              锁定
+            </button>
+            <button type="button" class="compass-btn ghost" @click="stopSensor">
+              取消
+            </button>
+          </template>
+        </div>
+        <p v-if="compassState === 'denied'" class="compass-hint">
+          未获方向传感器权限，请在浏览器或系统设置中允许访问后重试
+        </p>
+
         <p class="readout">坐{{ shan }}朝{{ xiang }}</p>
         <p class="overall-banner">
           <b>{{ overallInfo.name }}</b> —— {{ overallInfo.text }}
@@ -95,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onBeforeUnmount } from 'vue';
 import Luopan from './Luopan.vue';
 import FlyingStarPan from './FlyingStarPan.vue';
 import { yunPeriods } from '@/data/luopan';
@@ -109,7 +143,9 @@ import {
   specialPositions,
   palaceJudges,
   oppositeMountain,
+  mountainAt,
 } from '@/utils/fengShui';
+import { useCompassSensor } from '@/composables/useCompassSensor';
 
 defineEmits(['close']);
 
@@ -137,6 +173,32 @@ const periodInfo = computed(() => {
   const p = yunPeriods.find((x) => x.period === period.value);
   return p ? `${p.yuan}${period.value}运（${p.start}-${p.end}）` : '';
 });
+
+// 手机朝向对准：实时读数预览 + 手动锁定（锁定后写 selectedDir 走既有盘面链路）
+const {
+  supported: compassSupported,
+  state: compassState,
+  heading: compassHeading,
+  startCompass,
+  stopCompass,
+} = useCompassSensor();
+
+const liveName = computed(() =>
+  compassHeading.value === null ? '' : mountainAt(compassHeading.value)
+);
+
+function lockCompass() {
+  if (compassHeading.value === null) return;
+  selectedDir.value = mountainAt(compassHeading.value);
+  stopCompass();
+}
+
+function stopSensor() {
+  stopCompass();
+}
+
+// 离开页面即停止监听，避免后台耗电
+onBeforeUnmount(stopCompass);
 </script>
 
 <style scoped>
@@ -240,6 +302,49 @@ const periodInfo = computed(() => {
   font-size: 12px;
   color: var(--ink-light);
   margin: 0 0 10px;
+}
+.compass-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 auto 10px;
+  max-width: 520px;
+}
+.compass-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--scroll);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+.compass-btn:hover:not(:disabled) {
+  background: var(--gold);
+  color: #faf3e8;
+}
+.compass-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.compass-btn.ghost {
+  background: none;
+  border-style: dashed;
+}
+.compass-live {
+  font-size: 13px;
+  color: var(--cinnabar);
+}
+.compass-hint {
+  font-size: 12px;
+  color: var(--ink-light);
+  margin: 0 0 10px;
+  text-align: center;
 }
 .readout {
   font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
