@@ -69,7 +69,7 @@ const colloquialHint = computed(() => {
   } else {
     hint = '阴阳均衡，动静相宜——顺其自然、按部就班即可'
   }
-  return direction.value ? `${hint}。结合当前方向「${direction.value}」` : hint
+  return direction.value ? `结合当前方向「${direction.value}」，${hint}` : hint
 })
 </script>
 
