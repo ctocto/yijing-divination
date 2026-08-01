@@ -158,5 +158,77 @@ for (let period = 1; period <= 9; period++) {
 }
 check(seenJudges.has('ping'), 'overallJudge 全扫应能产出平局（ping 可达）');
 
+// —— 已知案例回归（已手算 + 文献核对）——
+// 五运子山午向 = 旺山旺向（山星1入中逆、向星9入中逆，旺星5双到山向）
+{
+  const pan = buildPan('子', '午', 5);
+  check(
+    overallJudge(pan, '子', '午', 5) === 'wangshan',
+    '五运子山午向应为旺山旺向'
+  );
+  check(pan.shan['坎'] === 5, '五运子山午向 山盘旺星5应在坎(坐山)');
+  check(pan.xiang['离'] === 5, '五运子山午向 向盘旺星5应在离(向首)');
+}
+// 八运乾山巽向 = 旺山旺向（山星9逆、向星7逆；区分同元龙法 vs 简化阴阳法）
+{
+  const pan = buildPan('乾', '巽', 8);
+  check(
+    overallJudge(pan, '乾', '巽', 8) === 'wangshan',
+    '八运乾山巽向应为旺山旺向'
+  );
+  check(pan.shan['乾'] === 8, '八运乾山巽向 山盘旺星8应在乾(坐山)');
+  check(pan.xiang['巽'] === 8, '八运乾山巽向 向盘旺星8应在巽(向首)');
+}
+// 七运子山午向 = 全局合十（每宫运星+山星=10）
+{
+  const pan = buildPan('子', '午', 7);
+  for (const [pal, y] of Object.entries(pan.yun)) {
+    check(
+      y + pan.shan[pal] === 10,
+      `七运子山午向 ${pal}宫 运星+山星应=10，实为 ${y + pan.shan[pal]}`
+    );
+  }
+}
+// 九运子山午向：山盘5入中逆、向盘4入中顺 —— 全盘核对
+{
+  const pan = buildPan('子', '午', 9);
+  check(pan.shan['中'] === 5, '九运子山午向 山盘入中应为5');
+  check(pan.xiang['中'] === 4, '九运子山午向 向盘入中应为4');
+  const expectedShan = {
+    中: 5,
+    乾: 4,
+    兑: 3,
+    艮: 2,
+    离: 1,
+    坎: 9,
+    坤: 8,
+    震: 7,
+    巽: 6,
+  };
+  for (const [pal, v] of Object.entries(expectedShan)) {
+    check(
+      pan.shan[pal] === v,
+      `九运子山午向 山盘${pal}应为${v}，实为${pan.shan[pal]}`
+    );
+  }
+  const expectedXiang = {
+    中: 4,
+    乾: 5,
+    兑: 6,
+    艮: 7,
+    离: 8,
+    坎: 9,
+    坤: 1,
+    震: 2,
+    巽: 3,
+  };
+  for (const [pal, v] of Object.entries(expectedXiang)) {
+    check(
+      pan.xiang[pal] === v,
+      `九运子山午向 向盘${pal}应为${v}，实为${pan.xiang[pal]}`
+    );
+  }
+}
+
 if (failed) process.exit(1);
 console.log('✓ 二十四山结构 / 三元九运 / 断语表完整性 校验通过');
