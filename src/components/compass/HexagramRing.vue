@@ -7,35 +7,20 @@
         :x="positionOf(pIdx, hIdx).x"
         :y="positionOf(pIdx, hIdx).y"
         :hexagram="hexagramByName(name)"
-        :highlighted="resultName === name"
+        :highlighted="litNames.has(name)"
         :selected="selectedName === name"
         @click="onGlyphClick(name)"
       />
     </template>
 
-    <!-- 选中卦象的说明标签（矩形以平移点为几何中心，上方/下方不重叠卦符） -->
-    <g v-if="selectedHexagram" :transform="`translate(${labelPos.x}, ${labelPos.y})`">
-      <rect :x="-58" :y="-20" width="116" height="40" rx="6" fill="#fffdf6" :stroke="theme.gold" stroke-width="1" />
-      <text
-        x="0"
-        y="-6"
-        text-anchor="middle"
-        font-size="14"
-        font-weight="bold"
-        :fill="theme.cinnabar"
-        style="font-family: 'Ma Shan Zheng', 'STKaiti', cursive;"
-      >{{ selectedHexagram.name }}</text>
-      <text x="0" y="12" text-anchor="middle" font-size="11" :fill="theme.inkLight">{{ selectedHexagram.text.slice(0, 10) }}</text>
-    </g>
   </g>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import HexagramGlyph from './HexagramGlyph.vue'
 import { palaces } from '@/data/palaces'
 import { hexagrams } from '@/data/hexagrams'
-import { theme } from '@/styles/theme'
 import { useCompass } from '@/composables/useCompass'
 
 const props = defineProps({
@@ -66,21 +51,29 @@ function positionOf(pIdx, hIdx) {
 }
 
 const selectedName = computed(() => selectedHexagram.value?.name || '')
-const resultName = computed(() => divinationResult.value?.name || '')
 
-// 说明标签位置：默认在卦符上方，靠顶部时翻转到下方避免溢出
-const labelPos = computed(() => {
-  const s = selectedHexagram.value
-  if (!s) return { x: 0, y: 0 }
-  for (let p = 0; p < palaces.length; p++) {
-    const idx = palaces[p].hexagrams.indexOf(s.name)
-    if (idx >= 0) {
-      const pos = positionOf(p, idx)
-      return pos.y < 80 ? { x: pos.x, y: pos.y + 44 } : { x: pos.x, y: pos.y - 44 }
-    }
+// 出卦后该宫 8 卦逐一进入 highlighted（每 120ms 一盏，点亮后保持朱砂态）
+const litNames = ref(new Set())
+let revealTimers = []
+watch(
+  () => divinationResult.value,
+  (result) => {
+    litNames.value = new Set()
+    revealTimers.forEach(clearTimeout)
+    revealTimers = []
+    if (!result) return
+    const palace = palaces.find(p => p.hexagrams.includes(result.name))
+    if (!palace) return
+    palace.hexagrams.forEach((name, i) => {
+      revealTimers.push(
+        setTimeout(() => {
+          litNames.value = new Set([...litNames.value, name])
+        }, i * 120)
+      )
+    })
   }
-  return { x: 0, y: 0 }
-})
+)
+onBeforeUnmount(() => revealTimers.forEach(clearTimeout))
 
 function onGlyphClick(name) {
   if (state.value !== 'idle') return
