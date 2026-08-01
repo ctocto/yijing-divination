@@ -130,7 +130,8 @@
 - `state` 新增 `'casting'`、`'browse'` 两个值
 - `castSpin()`：自动旋转动画（约 2.5s，ease-out 减速），结束复用 `completeSpin()`
 - `currentPalaceName`（computed）：由 `rotation` + `palaceIndexAt` 推导，旋转中实时显示
-- `showLibrary` / `openLibrary()` / `closeLibrary()`：卦库浏览态
+- `openLibrary()` / `closeLibrary()`：`state` 在 `'idle'` 与 `'browse'` 间切换
+- 详情面板：复用现有 `selectedHexagram`，在闲观态（点卦环）与卦库态（点卦格）均为 overlay，关闭方式一致（点空白 / 再点同卦）
 
 ---
 
