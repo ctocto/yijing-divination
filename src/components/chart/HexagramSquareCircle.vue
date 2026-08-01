@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import HexLines from './HexLines.vue'
 import { hexagrams } from '@/data/hexagrams'
 import { theme } from '@/styles/theme'
@@ -128,9 +128,47 @@ const trigramLabels = TRIGRAMS.map((t, i) => {
 
 const hoverName = ref(null)
 
+// —— 起卦扫描动画：高亮在多个随机卦位快速跳动、减速，最后落在抽中的卦上 ——
+const sweepName = ref(null)
+let sweepTimer = null
+
+watch(
+  () => props.casting,
+  (casting) => {
+    clearTimeout(sweepTimer)
+    sweepName.value = null
+    if (!casting || !props.castName) return
+    const STEPS = 15
+    const seq = []
+    for (let i = 0; i < STEPS - 1; i++) {
+      let n = randomName()
+      // 避免相邻重复；最后一个诱饵不能提前等于落点
+      while (n === seq[seq.length - 1] || (i === STEPS - 2 && n === props.castName)) {
+        n = randomName()
+      }
+      seq.push(n)
+    }
+    seq.push(props.castName)
+    let step = 0
+    const tick = () => {
+      if (step >= seq.length) return // 停在抽中的卦上
+      sweepName.value = seq[step]
+      step += 1
+      sweepTimer = setTimeout(tick, 12 + step * 6) // 减速：间隔随步数递增
+    }
+    tick()
+  },
+)
+
+onBeforeUnmount(() => clearTimeout(sweepTimer))
+
+function randomName() {
+  return hexagrams[Math.floor(Math.random() * hexagrams.length)].name
+}
+
 function slotState(name) {
   if (props.selected === name) return 'selected'
-  if (props.casting && props.castName === name) return 'casting'
+  if (props.casting && sweepName.value === name) return 'casting'
   if (hoverName.value === name) return 'hover'
   return 'normal'
 }
