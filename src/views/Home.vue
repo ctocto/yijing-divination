@@ -28,6 +28,7 @@
             <span class="info-name">{{ info.name }}</span>
             <span class="info-text">{{ info.plain }}</span>
           </template>
+          <span v-else-if="state === 'casting'" class="info-hint">扫描中，随机得卦…</span>
           <span v-else class="info-hint">悬停或点击卦象查看释义 · 静心起卦得卦</span>
         </div>
 
@@ -54,6 +55,7 @@
           </div>
           <button class="cast-btn" type="button" :disabled="state !== 'idle'" @click="drawHexagram">静 心 起 卦</button>
           <button class="library-link" type="button" @click="showLibrary = true">浏览六十四卦 ▸</button>
+          <button class="library-link" type="button" @click="showFengShui = true">风水罗盘 ▸</button>
           <p class="colophon">邵雍《皇极经世》· 六十四卦方位</p>
         </footer>
       </div>
@@ -64,6 +66,7 @@
     <HexagramDetailPanel v-if="selectedHexagram" />
     <HexagramLibrary v-if="showLibrary" @close="showLibrary = false" />
     <ResultScroll v-if="state === 'reading'" />
+    <FengShuiView v-if="showFengShui" @close="showFengShui = false" />
   </div>
 </template>
 
@@ -73,6 +76,7 @@ import HexagramSquareCircle from '../components/chart/HexagramSquareCircle.vue'
 import HexagramDetailPanel from '../components/compass/HexagramDetailPanel.vue'
 import HexagramLibrary from '../components/compass/HexagramLibrary.vue'
 import ResultScroll from '../components/scroll/ResultScroll.vue'
+import FengShuiView from '../components/fengshui/FengShuiView.vue'
 import { useCompass } from '../composables/useCompass'
 import { hexagrams } from '../data/hexagrams'
 
@@ -89,6 +93,7 @@ const {
 
 const hoverName = ref('')
 const showLibrary = ref(false)
+const showFengShui = ref(false)
 
 // 注释条显示：优先悬停卦，其次选中卦
 const info = computed(() => {
