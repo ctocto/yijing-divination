@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { mountains } from '@/data/luopan';
 import { mountainAt, oppositeMountain } from '@/utils/fengShui';
 import { theme } from '@/styles/theme';
@@ -136,7 +136,8 @@ const trigramAngles = [
 ];
 
 const angleOf = (name) => mountains.find((m) => m.name === name)?.angle ?? 0;
-const opposite = () => oppositeMountain(props.mountain);
+// computed 而非普通函数：模板 `{{ opposite }}` 会自动取 .value，普通函数会被渲染成源码字符串
+const opposite = computed(() => oppositeMountain(props.mountain));
 
 const pos = (a, r) => ({
   x: C + r * Math.sin((a * Math.PI) / 180),
