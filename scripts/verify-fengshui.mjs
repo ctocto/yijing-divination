@@ -2,6 +2,7 @@
 // 运行：node scripts/verify-fengshui.mjs
 import { mountains, yunPeriods } from '../src/data/luopan.js'
 import { stars, overallJudgments, specialPositions } from '../src/data/flyingStars.js'
+import { buildPan, yunPan, shanPan, xiangPan, PALACE_NUM, oppositeMountain } from '../src/utils/fengShui.js'
 
 let failed = false
 const check = (cond, msg) => {
@@ -41,6 +42,24 @@ for (const m of mountains) {
 check(stars.length === 9, `九星表应为 9 条，实为 ${stars.length}`)
 check(Object.keys(overallJudgments).length >= 7, '大局断语表不足 7 类')
 check(Object.keys(specialPositions).length >= 4, '特殊位文案不足 4 项')
+
+// —— 飞星盘结构 ——
+const isPermutation = (obj) => {
+  const vals = Object.values(obj)
+  return vals.length === 9 && new Set(vals).size === 9 && vals.every(v => v >= 1 && v <= 9)
+}
+for (let period = 1; period <= 9; period++) {
+  const yun = yunPan(period)
+  check(yun['中'] === period, `${period}运 运盘中心应为 ${period}`)
+  check(isPermutation(yun), `${period}运 运盘应为 1-9 排列`)
+  for (const m of mountains) {
+    check(isPermutation(shanPan(m.name, yun)), `${period}运 ${m.name}山 山盘应为 1-9 排列`)
+    check(isPermutation(xiangPan(m.name, yun)), `${period}运 ${m.name}向 向盘应为 1-9 排列`)
+  }
+}
+// 对宫互补抽样：子↔午、乾↔巽
+check(oppositeMountain('子') === '午', '子之对宫应为午')
+check(oppositeMountain('乾') === '巽', '乾之对宫应为巽')
 
 if (failed) process.exit(1)
 console.log('✓ 二十四山结构 / 三元九运 / 断语表完整性 校验通过')
