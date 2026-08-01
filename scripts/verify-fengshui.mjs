@@ -134,5 +134,29 @@ check(
   '九运盘应四特殊位齐备'
 );
 
+// 平局可达性：全扫 9运×24山×23向（向首须对宫之外的全组合），overallJudge 必须能产出 'ping' 且均为合法 key
+// 注：向首=对宫的 216 例恒为四象限结果（旺山/上山/双星到向/双星到山），ping 只出现在非对宫组合中。
+const judgeKeys = new Set(Object.keys(overallJudgments));
+const seenJudges = new Set();
+for (let period = 1; period <= 9; period++) {
+  for (const shan of mountains) {
+    for (const xiang of mountains) {
+      if (shan.name === xiang.name) continue;
+      const key = overallJudge(
+        buildPan(shan.name, xiang.name, period),
+        shan.name,
+        xiang.name,
+        period
+      );
+      seenJudges.add(key);
+      check(
+        judgeKeys.has(key),
+        `${period}运 ${shan.name}山${xiang.name}向 大局 key 非法：${key}`
+      );
+    }
+  }
+}
+check(seenJudges.has('ping'), 'overallJudge 全扫应能产出平局（ping 可达）');
+
 if (failed) process.exit(1);
 console.log('✓ 二十四山结构 / 三元九运 / 断语表完整性 校验通过');

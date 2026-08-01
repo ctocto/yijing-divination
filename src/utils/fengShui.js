@@ -104,12 +104,12 @@ export function overallJudge(pan, shan, xiang, period) {
   if (atXiang(shanStarPalace) && atShan(xiangStarPalace)) return 'shangshan';
   if (atXiang(shanStarPalace) && atXiang(xiangStarPalace)) return 'shuangXiang';
   if (atShan(shanStarPalace) && atShan(xiangStarPalace)) return 'shuangShan';
-  // 伏吟：星与宫同数；反吟：星与宫数合十
-  const fu = PALACES.find(
+  // 伏吟/反吟仅查坐山宫与向首宫（标准玄空口径；全盘扫描会让平局不可达）
+  const fu = [shanPalace, xiangPalace].find(
     (p) => pan.shan[p] === PALACE_NUM[p] || pan.xiang[p] === PALACE_NUM[p]
   );
   if (fu) return 'fuyin';
-  const fan = PALACES.find(
+  const fan = [shanPalace, xiangPalace].find(
     (p) =>
       pan.shan[p] + PALACE_NUM[p] === 10 || pan.xiang[p] + PALACE_NUM[p] === 10
   );
