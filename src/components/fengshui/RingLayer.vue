@@ -32,6 +32,7 @@
         :transform="`translate(${pos(it.angle, radius).x}, ${pos(it.angle, radius).y}) rotate(${it.angle})`"
         text-anchor="middle"
         dominant-baseline="central"
+        :style="interactive ? null : { pointerEvents: 'none' }"
         @pointerdown.stop="interactive && $emit('itemTap', it)"
       >
         <rect

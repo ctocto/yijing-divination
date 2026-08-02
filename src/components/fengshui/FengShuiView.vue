@@ -432,10 +432,13 @@ watch(
     if (m !== 'ding') fineAngle.value = null;
   }
 );
-// 分金判断：坐 = 十字线角度，向 = +180°
-const fenjin = computed(() =>
-  readout.value?.angle !== undefined ? judgeFenjin(readout.value.angle) : null
-);
+// 分金判断：坐 = 坐山物理角度，向 = 坐 +180°
+// 朝向口径下坐山为十字线对宫（+180°），与 shan/xiang 一致，避免坐向分金错配
+const fenjin = computed(() => {
+  if (readout.value?.angle === undefined) return null;
+  const shanAngle = readout.value.angle + (mode.value === '坐山' ? 0 : 180);
+  return judgeFenjin(shanAngle);
+});
 
 // 坐山/朝向：口径切换只改解释，山盘/向盘始终用坐山/朝向
 const shan = computed(() =>

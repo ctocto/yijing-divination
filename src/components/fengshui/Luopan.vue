@@ -343,6 +343,9 @@ function onUp() {
   const step = props.mode === 'ding' ? 3 : 15;
   const snapped = Math.round(rot.value / step) * step;
   rot.value = snapped;
+  // 吸附后立即同步发射读数，令父级 fineAngle 收敛至吸附值；
+  // 否则 select 触发 position watch 时 fineAngle 仍是吸附前旧值，回写覆盖 3° 吸附
+  emit('readout', readout.value);
   emit('select', mountainAt(-snapped));
 }
 
