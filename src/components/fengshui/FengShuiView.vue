@@ -613,6 +613,15 @@ onBeforeUnmount(stopCompass);
   border-top: 1px solid var(--gold);
   padding: 14px 2px;
 }
+.fs-yijing h2,
+.fs-zeri h2 {
+  font-size: 16px;
+  color: var(--ink);
+  border-bottom: 1px dashed var(--gold);
+  padding-bottom: 6px;
+  letter-spacing: 0.12em;
+  margin: 20px 0 10px;
+}
 .yi-ben {
   font-size: 15px;
   color: var(--deep-ink);
