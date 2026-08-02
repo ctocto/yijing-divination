@@ -20,7 +20,7 @@ export interface ShuiResult {
   outPos: string | null;
   inLai: '吉' | '凶' | '慎' | null;
   inText: string;
-  outQu: '吉' | '凶' | '慎' | null;
+  outQu: '吉' | '凶' | '慎' | '忌' | null;
   outText: string;
   summary: string;
 }
