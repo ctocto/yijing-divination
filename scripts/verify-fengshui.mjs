@@ -66,6 +66,7 @@ import {
   positionAt,
   judgeShui,
 } from '../src/utils/shui.js';
+import { jianChu, huangDao, termMonth } from '../src/data/zeriData.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -635,6 +636,33 @@ check(shuangshanAt(45) === '艮寅', '坐艮(45°)应归艮寅双山');
 check(shuangshanAt(165) === '丙午', '坐丙(165°)应归丙午双山');
 check(shuangshanAt(225) === '坤申', '坐坤(225°)应归坤申双山');
 check(shuangshanAt(315) === '乾亥', '坐乾(315°)应归乾亥双山');
+
+// —— 择日数据 ——
+check(jianChu.length === 12, '建除十二神应 12 条');
+check(huangDao.length === 12, '黄道黑道应 12 条');
+check(
+  jianChu.map((j) => j.name).join('') === '建除满平定执破危成收开闭',
+  '建除十二神顺序应 建除满平定执破危成收开闭'
+);
+// 黄道黑道与建除同序差：黄道 6 条
+check(huangDao.filter((h) => h.dao === '黄').length === 6, '黄道应恰好 6 条');
+check(
+  huangDao[0].name === '青龙' && huangDao[0].dao === '黄',
+  '序差0应为青龙黄道'
+);
+check(
+  huangDao[2].name === '天刑' && huangDao[2].dao === '黑',
+  '序差2应为天刑黑道'
+);
+check(Object.keys(termMonth).length === 24, '节气月建表应 24 节气');
+check(
+  termMonth['立春'] === '寅' && termMonth['雨水'] === '寅',
+  '立春雨水应同属寅月'
+);
+check(
+  termMonth['冬至'] === '子' && termMonth['小寒'] === '丑',
+  '冬至子月小寒丑月'
+);
 
 if (failed) process.exit(1);
 console.log(
