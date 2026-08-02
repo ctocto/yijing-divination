@@ -19,6 +19,7 @@ import {
 } from '../src/utils/fengShui.js';
 import { fuXiRing } from '../src/utils/fuXiOrder.js';
 import { mansions } from '../src/data/mansions.js';
+import { jiazi } from '../src/data/jiazi.js';
 import {
   humanMountains,
   heavenMountains,
@@ -307,6 +308,18 @@ check(
 );
 const names = mansions.map((m) => m.name);
 check(new Set(names).size === 28, '二十八宿宿名不应重复');
+
+// —— 六十甲子 ——
+check(jiazi.length === 60, `六十甲子应为 60 条，实为 ${jiazi.length}`);
+check(jiazi[0].name === '甲子' && jiazi[0].angle === 0, '甲子应在 0°');
+check(
+  jiazi.every((j, i) => j.angle === i * 6),
+  '六十甲子应每 6° 连续'
+);
+check(
+  jiazi.every((j) => j.nian && j.nian.length > 0),
+  '每柱应有纳音'
+);
 
 if (failed) process.exit(1);
 console.log('✓ 二十四山结构 / 三元九运 / 断语表完整性 校验通过');
