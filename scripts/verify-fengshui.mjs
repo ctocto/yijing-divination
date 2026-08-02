@@ -43,6 +43,15 @@ import {
   shaJudgments,
   baShaText,
 } from '../src/data/shaData.js';
+import {
+  mansionShengAt,
+  lineWuxingAt,
+  judgeSha,
+  judgeAllSha,
+  baShaAt,
+  fenFang,
+  mansionAtDetail,
+} from '../src/utils/sha.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -487,6 +496,36 @@ check(
   '五种砂断语应齐全'
 );
 check(baShaText.length > 0, '八煞提示文案不应为空');
+
+// —— 消砂算法 ——
+// 宿度边界按古度 366 比例归一至 360°：角0-11.8 亢11.8-20.7 …（verify 断言按归一后边界取角）
+check(mansionAtDetail(0).mansion.name === '角', '0° 应在角宿');
+check(
+  mansionAtDetail(180).mansion.name === '奎',
+  '180° 归一后应在奎宿（古度 168-186）'
+);
+check(mansionShengAt(0) === '木', '0°（角宿）宿主五行应为木');
+check(
+  mansionShengAt(45) === '火',
+  '45° 归一后在心宿（40-45°），宿主五行应为火'
+);
+check(
+  lineWuxingAt(0) === '火',
+  '坐子（角宿第 1 度）线度五行应为火（角属火组起度火）'
+);
+check(judgeSha('木', '木') === 'wang', '同我 → 旺砂');
+check(judgeSha('木', '水') === 'sheng', '水生木 → 生砂');
+check(judgeSha('木', '土') === 'cai', '木克土 → 财砂');
+check(judgeSha('木', '火') === 'xie', '木生火 → 泄砂');
+check(judgeSha('木', '金') === 'sha', '金克木 → 煞砂');
+const allSha = judgeAllSha(0);
+check(allSha.length === 8, `八方砂应 8 条，实为 ${allSha.length}`);
+check(
+  allSha.every((s) => s.dir && s.name && s.text),
+  '每条砂应含 方位/砂名/断语'
+);
+check(baShaAt(0) && baShaAt(0).branch === '辰', '坐坎八煞应为辰');
+check(fenFang(0).length === 3, '子方应属天元龙（应 3 房）');
 
 if (failed) process.exit(1);
 console.log(
