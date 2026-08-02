@@ -34,6 +34,15 @@ import {
   plateMountainAt,
 } from '../src/utils/luopanRead.js';
 import { RING_TYPES, MODES, modeRings } from '../src/data/luopanRings.js';
+import {
+  LINE_CYCLE,
+  lineStart,
+  baSha,
+  BRANCH_ANGLE,
+  sanYuanLong,
+  shaJudgments,
+  baShaText,
+} from '../src/data/shaData.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -426,6 +435,58 @@ check(
   ),
   '宿主五行应满足：七曜 日/月→火，其余同 wuxing'
 );
+
+// —— 消砂数据 ——
+check(LINE_CYCLE.join('') === '金木水火土', '线度五行循环应为 金木水火土');
+check(
+  Object.keys(lineStart).length === 28,
+  `线度五行起度应覆盖 28 宿，实为 ${Object.keys(lineStart).length}`
+);
+check(
+  mansions.every((m) => m.name in lineStart),
+  '每宿都应有线度五行起度'
+);
+// 五组起度五行核对（星属木组、虚属金组）
+const startWuxing = { 金: 0, 木: 1, 水: 2, 火: 3, 土: 4 };
+const GROUP = {
+  金: ['井', '鬼', '室', '参', '娄', '亢', '虚', '氐', '箕', '斗'],
+  木: ['心', '星', '房'],
+  水: ['张', '奎', '胃', '昴', '牛', '尾'],
+  火: ['角', '壁', '毕', '柳'],
+  土: ['翼', '轸', '觜', '危', '女'],
+};
+for (const [wx, names] of Object.entries(GROUP)) {
+  check(
+    names.every((n) => lineStart[n] === startWuxing[wx]),
+    `${wx}组起度应为 ${wx}`
+  );
+}
+const allStart = Object.values(GROUP).flat();
+check(new Set(allStart).size === 28, '五组应覆盖 28 宿且不重复');
+check(
+  Object.keys(baSha).length === 8,
+  `八煞应 8 卦，实为 ${Object.keys(baSha).length}`
+);
+check(Object.keys(BRANCH_ANGLE).length === 12, '地支方位应 12 支');
+check(
+  Object.values(BRANCH_ANGLE)
+    .sort((a, b) => a - b)
+    .every((a, i) => a === i * 30),
+  '十二地支应每 30° 连续'
+);
+const sanYuanDirs = [
+  ...sanYuanLong.天元.dirs,
+  ...sanYuanLong.地元.dirs,
+  ...sanYuanLong.人元.dirs,
+];
+check(new Set(sanYuanDirs).size === 24, '三元龙应覆盖 24 山');
+check(
+  ['sheng', 'wang', 'cai', 'xie', 'sha'].every(
+    (k) => shaJudgments[k] && shaJudgments[k].text
+  ),
+  '五种砂断语应齐全'
+);
+check(baShaText.length > 0, '八煞提示文案不应为空');
 
 if (failed) process.exit(1);
 console.log(
