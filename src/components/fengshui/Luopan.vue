@@ -3,7 +3,7 @@
     <svg
       ref="svgEl"
       class="luopan-svg"
-      viewBox="0 0 520 520"
+      viewBox="0 0 540 540"
       :style="{ cursor: dragging ? 'grabbing' : 'grab' }"
     >
       <!-- 外装饰环（固定） -->
@@ -24,6 +24,9 @@
         stroke-width="0.7"
         stroke-dasharray="2 5"
       />
+
+      <!-- 固定指针（红针标坐山/朝向）——置于旋转内盘之下，度数大字压在针体上方不被遮挡 -->
+      <path :d="pointerPath" :fill="theme.cinnabar" />
 
       <!-- 旋转内盘：圈配置驱动 -->
       <g :transform="`rotate(${rot} ${C} ${C})`">
@@ -111,13 +114,12 @@
         />
       </g>
 
-      <!-- 固定指针（红针标坐山/朝向）+ 对宫金点/山名 -->
-      <path :d="pointerPath" :fill="theme.cinnabar" />
-      <circle :cx="C" :cy="C + 212" r="5" :fill="theme.gold" />
+      <!-- 对宫金点/山名（固定）——金点出圈外，如红针般标在对宫方位 -->
+      <circle :cx="C" :cy="C + 246" r="4" :fill="theme.gold" />
       <text
         class="opposite-name"
         :x="C"
-        :y="C + 240"
+        :y="C + 260"
         text-anchor="middle"
         dominant-baseline="central"
       >
@@ -161,7 +163,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['select', 'readout']);
 
-const C = 260;
+const C = 270;
 const svgEl = ref(null);
 const dragging = ref(false);
 const rot = ref(0);
@@ -221,7 +223,8 @@ const bubbleDy = computed(() =>
   beta.value === null ? 0 : clamp01(beta.value / LEVEL_TOLERANCE) * BUBBLE_MAX
 );
 
-const pointerPath = `M ${C} 14 L ${C + 9} 34 L ${C} 27 L ${C - 9} 34 Z`;
+// 红针：基部在刻度圈内侧（r≈224）、针尖伸出外圈（r≈256），度数大字可压过针体
+const pointerPath = `M ${C} 14 L ${C + 8} 46 L ${C} 30 L ${C - 8} 46 Z`;
 
 // 旋转来源：传感运行中跟随手机朝向（平滑），否则吸附到选中山
 watch(
@@ -349,7 +352,7 @@ function select(name) {
   pointer-events: none;
 }
 .opposite-name {
-  font-size: 13px;
+  font-size: 12px;
   fill: var(--gold);
   pointer-events: none;
 }

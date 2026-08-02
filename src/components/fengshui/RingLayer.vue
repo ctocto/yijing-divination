@@ -15,8 +15,8 @@
       <text
         v-for="(it, i) in bigItems"
         :key="'t' + i"
-        :x="pos(it.angle, radius - 1).x"
-        :y="pos(it.angle, radius - 1).y"
+        :x="pos(it.angle, radius + DEG_LABEL_OFFSET).x"
+        :y="pos(it.angle, radius + DEG_LABEL_OFFSET).y"
         text-anchor="middle"
         dominant-baseline="central"
         class="deg-label"
@@ -98,6 +98,7 @@ const pos = (a, r) => ({
   y: -Math.cos((a * Math.PI) / 180) * r,
 });
 
+const DEG_LABEL_OFFSET = 15; // 度数大字置于刻度圈外侧（超出外圈边沿，不被刻度遮挡）
 const tickLen = (it) => (it.big ? 10 : it.major ? 6 : 3);
 const bigItems = computed(() => props.items.filter((it) => it.label));
 const activeFill = 'rgba(178,58,46,0.14)';
