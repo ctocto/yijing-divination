@@ -85,6 +85,7 @@ import {
   FENJIN_ZHI,
   GAN_SEQ,
 } from '../src/data/fenjin.js';
+import { fenjinAt, judgeFenjin } from '../src/utils/fenjin.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -811,6 +812,31 @@ check(
   fenjin120.every((f) => jiazi.some((j) => j.name === f.name)),
   '每个分金名都应存在于六十甲子'
 );
+
+// —— 分金算法 ——
+check(fenjinAt(357).name === '丙子', '357° 分金应为丙子');
+check(fenjinAt(0).name === '戊子', '0° 分金应为戊子（正中龟甲）');
+const fjKw = fenjinAt(7.5);
+check(fjKw.type === 'kongwang', '7.5° 应为骑缝空亡');
+check(
+  fjKw.a === '子' && fjKw.b === '癸',
+  '7.5° 骑缝应邻 子(减侧)/癸(加侧) 两山'
+);
+const fj0 = judgeFenjin(0);
+check(
+  fj0.shan.name === '戊子' && fj0.shan.level === '龟甲',
+  '坐 0° 分金应戊子龟甲'
+);
+check(
+  fj0.xiang.name === '戊午' && fj0.xiang.level === '龟甲',
+  '向 180° 分金应戊午龟甲'
+);
+check(fj0.shan.ji === '凶' && fj0.shan.text.includes('不宜立向'), '龟甲应断凶');
+// 坐向对称：任取角度，坐/向分金吉凶一致（同天干同判）
+for (const a of [0, 3, 45, 100, 200, 357]) {
+  const r = judgeFenjin(a);
+  check(r.shan.level === r.xiang.level, `${a}° 坐向分金吉凶应对称`);
+}
 
 if (failed) process.exit(1);
 console.log(
