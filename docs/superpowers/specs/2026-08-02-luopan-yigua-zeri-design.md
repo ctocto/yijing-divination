@@ -166,7 +166,7 @@ export function judgeZeri(term, jiaziName) {
 ## 验证
 
 1. `scripts/verify-fengshui.mjs` 追加：
-   - `drawLine` 已知用例（乾 111111 抽初爻 → 111110 天风姤；坤 000000 抽上爻 → 100000 地雷复）；
+   - `drawLine` 已知用例（乾 111111 抽初爻 → 011111 天风姤、抽上爻 → 111110 泽天夬；坤 000000 抽初爻 → 100000 地雷复、抽上爻 → 000001 山地剥）；
    - `lineName` 已知用例（乾初爻=初九、坤上爻=上六）；
    - `judgeChouYao` 断语含爻辞 + 变卦卦辞；
    - `termMonth` 12 节气→支完备；
