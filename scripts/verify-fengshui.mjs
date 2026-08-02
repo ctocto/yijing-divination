@@ -53,6 +53,12 @@ import {
   fenFangByMountain,
   mansionAtDetail,
 } from '../src/utils/sha.js';
+import {
+  shuangshan,
+  JUS,
+  CHANGSHENG_ORDER,
+  CHANGSHENG_JUDGE,
+} from '../src/data/shuiData.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -541,7 +547,58 @@ check(
   '卦宫 3 山应房应有区分度（地/天/人元各一）'
 );
 
+// —— 纳水数据 ——
+check(shuangshan.length === 12, `双山应 12 组，实为 ${shuangshan.length}`);
+check(
+  shuangshan.every((s, i) => s.angle === i * 30),
+  '双山中心角应每 30° 连续'
+);
+// 三合五行 → 局归属：水局=坤申壬子乙辰、火局=艮寅丙午辛戌、金局=巽巳庚酉癸丑、木局=乾亥甲卯丁未
+const JU_GROUP = {
+  水: ['坤申', '壬子', '乙辰'],
+  火: ['艮寅', '丙午', '辛戌'],
+  金: ['巽巳', '庚酉', '癸丑'],
+  木: ['乾亥', '甲卯', '丁未'],
+};
+for (const [ju, names] of Object.entries(JU_GROUP)) {
+  check(
+    names.every((n) => shuangshan.find((s) => s.name === n)?.wuxing === ju),
+    `${ju}局双山五行应全部为 ${ju}`
+  );
+}
+const allShuangshan = Object.values(JU_GROUP).flat();
+check(new Set(allShuangshan).size === 12, '四局应覆盖 12 双山且不重复');
+check(JUS.length === 4, `应 4 局，实为 ${JUS.length}`);
+const JU_ANCHOR = {
+  木: { changsheng: '乾亥', diwang: '甲卯', muku: '丁未' },
+  火: { changsheng: '艮寅', diwang: '丙午', muku: '辛戌' },
+  水: { changsheng: '坤申', diwang: '壬子', muku: '乙辰' },
+  金: { changsheng: '巽巳', diwang: '庚酉', muku: '癸丑' },
+};
+check(
+  JUS.every((j) => {
+    const a = JU_ANCHOR[j.name];
+    return (
+      a &&
+      j.changsheng === a.changsheng &&
+      j.diwang === a.diwang &&
+      j.muku === a.muku
+    );
+  }),
+  '四局长生/帝旺/墓库应与权威表一致'
+);
+check(
+  CHANGSHENG_ORDER.length === 12 &&
+    CHANGSHENG_ORDER[0] === '长生' &&
+    CHANGSHENG_ORDER[11] === '养',
+  '十二长生序应 12 位（长生起养止）'
+);
+check(
+  CHANGSHENG_ORDER.every((p) => CHANGSHENG_JUDGE[p]),
+  '十二长生每位都应有吉凶断语'
+);
+
 if (failed) process.exit(1);
 console.log(
-  '✓ 二十四山/三盘三针/节气/度数/二十八宿/六十甲子/卦环/读数/圈映射/飞星逻辑 校验通过'
+  '✓ 二十四山/三盘三针/节气/度数/二十八宿/六十甲子/卦环/读数/圈映射/飞星逻辑/纳水数据 校验通过'
 );
