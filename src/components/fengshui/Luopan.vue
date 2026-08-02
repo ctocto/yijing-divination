@@ -88,6 +88,16 @@
         </g>
       </g>
 
+      <!-- 盘心水平气泡（仅传感运行中；固定层，倾斜相对手机屏幕） -->
+      <g
+        v-if="sensorState === 'running' && beta !== null && gamma !== null"
+        aria-hidden="true"
+      >
+        <circle :cx="C" :cy="C" r="26" fill="#fffdf6" :stroke="theme.goldLight" stroke-width="1" />
+        <circle :cx="C" :cy="C" r="21" fill="none" :stroke="theme.goldLight" stroke-width="0.6" stroke-dasharray="1 4" />
+        <circle :cx="C + bubbleDx" :cy="C + bubbleDy" r="4.5" :fill="level ? theme.cinnabar : theme.inkLight" />
+      </g>
+
       <!-- 固定指针（红针标坐山/朝向） -->
       <path :d="pointerPath" :fill="theme.cinnabar" />
       <!-- 对宫金点 + 对宫山名 -->
@@ -145,6 +155,16 @@ const pos = (a, r) => ({
   x: C + r * Math.sin((a * Math.PI) / 180),
   y: C - r * Math.cos((a * Math.PI) / 180),
 });
+
+// 气泡偏移：倾斜度/容差 归一化后按像素钳制（符号待真机验证，必要时 dx 取反）
+const BUBBLE_MAX = 14;
+const clamp01 = (v) => Math.max(-1, Math.min(1, v));
+const bubbleDx = computed(() =>
+  gamma.value === null ? 0 : clamp01(gamma.value / LEVEL_TOLERANCE) * BUBBLE_MAX
+);
+const bubbleDy = computed(() =>
+  beta.value === null ? 0 : clamp01(beta.value / LEVEL_TOLERANCE) * BUBBLE_MAX
+);
 
 const pointerPath = `M ${C} 14 L ${C + 9} 34 L ${C} 27 L ${C - 9} 34 Z`;
 
