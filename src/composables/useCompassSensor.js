@@ -1,5 +1,5 @@
 // 手机方向传感器（指南针）封装 —— 模块级单例，供风水罗盘「手机朝向对准」使用
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 // 能力检测：需 DeviceOrientationEvent 且为触屏设备（桌面无磁力计，自动隐藏入口）
 const canUse = () =>
@@ -14,6 +14,19 @@ const heading = ref(null); // 平滑后的实时朝向 0-360（null = 尚无读�
 
 let listener = null;
 let buf = [];
+
+// 水平检测：平放时 beta≈90、gamma≈0；两轴都在容差内视为水平
+export const LEVEL_TOLERANCE = 8;
+const beta = ref(null); // 前后倾（°）
+const gamma = ref(null); // 左右倾（°）
+const level = computed(
+  () =>
+    beta.value !== null &&
+    gamma.value !== null &&
+    Math.abs(beta.value - 90) <= LEVEL_TOLERANCE &&
+    Math.abs(gamma.value) <= LEVEL_TOLERANCE
+);
+
 const WINDOW = 5; // 平滑窗口（滑动平均）
 
 // 事件 → 当前屏顶朝向（度，0=北，顺时针）
@@ -46,6 +59,8 @@ function smooth(deg) {
 }
 
 function onOrientation(e) {
+  if (typeof e.beta === 'number') beta.value = e.beta;
+  if (typeof e.gamma === 'number') gamma.value = e.gamma;
   const h = headingFrom(e);
   if (h === null) return;
   heading.value = smooth(h);
@@ -74,9 +89,11 @@ export function stopCompass() {
   }
   buf = [];
   heading.value = null;
+  beta.value = null;
+  gamma.value = null;
   if (state.value === 'running') state.value = 'idle';
 }
 
 export function useCompassSensor() {
-  return { supported, state, heading, startCompass, stopCompass };
+  return { supported, state, heading, beta, gamma, level, startCompass, stopCompass };
 }
