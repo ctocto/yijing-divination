@@ -224,6 +224,59 @@
         </section>
       </template>
 
+      <template v-else-if="luopanMode === 'na'">
+        <section class="fs-shui">
+          <h2>纳水判断</h2>
+          <p class="shui-shan">
+            坐山 {{ selectedDir }} → {{ shuiJu.ju }}局（长生
+            {{ shuiJu.changshengName }}）
+          </p>
+          <div class="flow-switch" role="group" aria-label="水流方向">
+            <button
+              type="button"
+              :class="{ active: flow === 'left' }"
+              @click="flow = 'left'"
+            >
+              左水倒右
+            </button>
+            <button
+              type="button"
+              :class="{ active: flow === 'right' }"
+              @click="flow = 'right'"
+            >
+              右水倒左
+            </button>
+          </div>
+          <div class="shui-lock">
+            <button type="button" @click="inAngle = readout?.angle ?? null">
+              锁定来水
+            </button>
+            <button type="button" @click="outAngle = readout?.angle ?? null">
+              锁定去水
+            </button>
+            <span v-if="inAngle !== null" class="shui-locked"
+              >来水 {{ inAngle }}°</span
+            >
+            <span v-if="outAngle !== null" class="shui-locked"
+              >去水 {{ outAngle }}°</span
+            >
+          </div>
+          <template v-if="shuiInfo">
+            <p class="shui-pos">
+              来水 <b>{{ shuiInfo.inPos }}</b
+              >（{{ shuiInfo.inLai }}）· {{ shuiInfo.inText }}
+            </p>
+            <p class="shui-pos">
+              去水 <b>{{ shuiInfo.outPos }}</b
+              >（{{ shuiInfo.outQu }}）· {{ shuiInfo.outText }}
+            </p>
+            <p class="shui-summary">{{ shuiInfo.summary }}</p>
+          </template>
+          <p v-else class="shui-hint">请先锁定来水与去水方位</p>
+          <p class="fs-disclaimer">三合水法 · 文化参考</p>
+        </section>
+      </template>
+
       <section v-else class="fs-pending">
         <h2>判断区</h2>
         <p class="pending-text">
@@ -240,6 +293,7 @@ import Luopan from './Luopan.vue';
 import { MODES } from '@/data/luopanRings';
 import FlyingStarPan from './FlyingStarPan.vue';
 import { yunPeriods, mountains } from '@/data/luopan';
+import { judgeJu, judgeShui } from '@/utils/shui';
 import {
   judgeAllSha,
   lineWuxingAt,
@@ -317,6 +371,17 @@ const currentDir = computed(
 );
 const currentSha = computed(() =>
   shaRows.value.find((s) => s.deg === currentDir.value)
+);
+
+// —— 纳水判断 ——
+const flow = ref('left'); // 'left' 左水倒右 | 'right' 右水倒左
+const inAngle = ref(null); // 锁定来水角度
+const outAngle = ref(null); // 锁定去水角度
+const shuiJu = computed(() => judgeJu(shanAngle.value));
+const shuiInfo = computed(() =>
+  inAngle.value !== null && outAngle.value !== null
+    ? judgeShui(shanAngle.value, inAngle.value, outAngle.value, flow.value)
+    : null
 );
 
 // 手机朝向对准：实时读数预览 + 手动锁定（锁定后写 selectedDir 走既有盘面链路）
@@ -512,6 +577,77 @@ onBeforeUnmount(stopCompass);
   border-radius: 6px;
   padding: 8px 12px;
   background: var(--scroll);
+  margin: 0 0 10px;
+}
+.fs-shui {
+  max-width: 560px;
+  margin: 0 auto;
+}
+.fs-shui h2 {
+  font-size: 16px;
+  color: var(--ink);
+  border-bottom: 1px dashed var(--gold);
+  padding-bottom: 6px;
+  letter-spacing: 0.12em;
+  margin: 20px 0 10px;
+}
+.shui-shan {
+  font-size: 14px;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.flow-switch,
+.shui-lock {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 auto 10px;
+}
+.flow-switch button,
+.shui-lock button {
+  padding: 7px 14px;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--scroll);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+.flow-switch button.active {
+  background: var(--cinnabar);
+  color: #faf3e8;
+}
+.shui-locked {
+  font-size: 13px;
+  color: var(--cinnabar);
+  align-self: center;
+}
+.shui-pos {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+.shui-pos b {
+  color: var(--cinnabar);
+}
+.shui-summary {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+  border: 1px solid var(--gold-light);
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: var(--scroll);
+  margin: 0 0 10px;
+}
+.shui-hint {
+  font-size: 13px;
+  color: var(--ink-light);
   margin: 0 0 10px;
 }
 .period-row {
