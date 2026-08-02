@@ -59,6 +59,13 @@ import {
   CHANGSHENG_ORDER,
   CHANGSHENG_JUDGE,
 } from '../src/data/shuiData.js';
+import {
+  shuangshanAt,
+  judgeJu,
+  changshengMap,
+  positionAt,
+  judgeShui,
+} from '../src/utils/shui.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -597,6 +604,31 @@ check(
   CHANGSHENG_ORDER.every((p) => CHANGSHENG_JUDGE[p]),
   '十二长生每位都应有吉凶断语'
 );
+
+// —— 纳水算法 ——
+check(shuangshanAt(0) === '壬子', '0° 应在壬子双山');
+check(shuangshanAt(240) === '坤申', '240° 应在坤申双山');
+check(judgeJu(0).ju === '水', '坐壬子应定水局');
+check(judgeJu(0).changshengName === '坤申', '水局长生应为坤申');
+// 水局顺排（左水倒右）：长生坤申 帝旺壬子 墓库乙辰
+const leftMap = changshengMap('水', 'left');
+check(leftMap['坤申'] === '长生', '水局左倒右坤申应为长生');
+check(leftMap['壬子'] === '帝旺', '水局左倒右壬子应为帝旺');
+check(leftMap['乙辰'] === '墓', '水局左倒右乙辰应为墓');
+// 水局逆排（右水倒左）：长生坤申 逆布，沐浴在丁未
+const rightMap = changshengMap('水', 'right');
+check(rightMap['坤申'] === '长生', '水局右倒左坤申仍为长生');
+check(rightMap['丁未'] === '沐浴', '水局右倒左丁未应为沐浴（逆布）');
+check(leftMap['丁未'] !== rightMap['丁未'], '阳顺阴逆排布应有差异');
+check(positionAt(leftMap, 240) === '长生', '240° 水局顺排应为长生');
+// 完整用例：坐壬子水局 左倒右 来水坤申(长生吉) 去水乙辰(墓库吉)
+const r = judgeShui(0, 240, 120, 'left');
+check(
+  r.ju === '水' && r.inPos === '长生' && r.outPos === '墓',
+  '坐壬子来坤申去乙辰 应为 长生/墓'
+);
+check(r.inLai === '吉' && r.outQu === '吉', '长生来水吉 墓库去水吉');
+check(r.summary.includes('迎生接旺'), '总评应含迎生接旺');
 
 if (failed) process.exit(1);
 console.log(
