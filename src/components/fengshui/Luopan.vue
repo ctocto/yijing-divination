@@ -24,16 +24,12 @@
         stroke-width="0.7"
         stroke-dasharray="2 5"
       />
-      <circle
-        :cx="C"
-        :cy="C"
-        :r="92"
-        fill="none"
-        :stroke="theme.goldLight"
-        stroke-width="0.7"
-      />
 
-      <!-- 旋转内盘：24 山 + 八卦方位 -->
+      <!-- 天心十道（固定，压圈之上） -->
+      <line :x1="C - 224" :y1="C" :x2="C + 224" :y2="C" class="crosshair" />
+      <line :x1="C" :y1="C - 224" :x2="C" :y2="C + 224" class="crosshair" />
+
+      <!-- 旋转内盘：圈配置驱动 -->
       <g :transform="`rotate(${rot} ${C} ${C})`">
         <!-- 拖拽命中圈（透明整圆） -->
         <circle
@@ -47,60 +43,75 @@
           @pointercancel="onUp"
         />
 
-        <!-- 24 山 -->
-        <g
-          v-for="m in mountains"
-          :key="m.name"
-          :transform="`translate(${pos(m.angle, 196).x}, ${pos(m.angle, 196).y}) rotate(${m.angle})`"
-          @pointerdown.stop.prevent="select(m.name)"
-        >
-          <rect
-            x="-16"
-            y="-14"
-            width="32"
-            height="30"
-            rx="3"
-            :fill="
-              m.name === props.mountain ? 'rgba(178,58,46,0.14)' : 'transparent'
-            "
+        <!-- 模式圈集 -->
+        <g :transform="`translate(${C} ${C})`">
+          <RingLayer
+            v-for="rid in activeRings"
+            :key="rid"
+            :type="RING_TYPES[rid].type"
+            :radius="RING_TYPES[rid].radius"
+            :items="ringItems(rid)"
+            :interactive="interactiveRings.includes(rid)"
+            @item-tap="onItemTap"
           />
-          <text
-            class="mountain-name"
-            :class="{ active: m.name === props.mountain }"
-            text-anchor="middle"
-            dominant-baseline="central"
-          >
-            {{ m.name }}
-          </text>
-        </g>
-
-        <!-- 八卦方位：卦符 + 卦名·洛书数 -->
-        <g
-          v-for="t in trigramAngles"
-          :key="t.name"
-          :transform="`translate(${pos(t.angle, 150).x}, ${pos(t.angle, 150).y})`"
-          text-anchor="middle"
-        >
-          <text class="tri-glyph" dominant-baseline="central" y="-8">
-            {{ t.trigram }}
-          </text>
-          <text class="tri-sub" y="16">{{ t.name }}·{{ t.num }}</text>
         </g>
       </g>
 
-      <!-- 盘心水平气泡（仅传感运行中；固定层，倾斜相对手机屏幕） -->
+      <!-- 天池（盘心，固定） -->
+      <g class="tianchi" aria-hidden="true">
+        <circle
+          :cx="C"
+          :cy="C"
+          r="64"
+          fill="#fffdf6"
+          :stroke="theme.goldLight"
+          stroke-width="0.8"
+        />
+        <circle
+          :cx="C"
+          :cy="C"
+          r="58"
+          fill="none"
+          :stroke="theme.goldLight"
+          stroke-width="0.5"
+          stroke-dasharray="1 4"
+        />
+        <line :x1="C" :y1="C - 58" :x2="C" :y2="C + 58" class="needle-line" />
+        <circle :cx="C" :cy="C" r="4" :fill="theme.cinnabar" />
+      </g>
+
+      <!-- 盘心水平气泡（仅传感运行中；覆盖天池上方） -->
       <g
         v-if="sensorState === 'running' && beta !== null && gamma !== null"
         aria-hidden="true"
       >
-        <circle :cx="C" :cy="C" r="26" fill="#fffdf6" :stroke="theme.goldLight" stroke-width="1" />
-        <circle :cx="C" :cy="C" r="21" fill="none" :stroke="theme.goldLight" stroke-width="0.6" stroke-dasharray="1 4" />
-        <circle :cx="C + bubbleDx" :cy="C + bubbleDy" r="4.5" :fill="level ? theme.cinnabar : theme.inkLight" />
+        <circle
+          :cx="C"
+          :cy="C"
+          r="26"
+          fill="#fffdf6"
+          :stroke="theme.goldLight"
+          stroke-width="1"
+        />
+        <circle
+          :cx="C"
+          :cy="C"
+          r="21"
+          fill="none"
+          :stroke="theme.goldLight"
+          stroke-width="0.6"
+          stroke-dasharray="1 4"
+        />
+        <circle
+          :cx="C + bubbleDx"
+          :cy="C + bubbleDy"
+          r="4.5"
+          :fill="level ? theme.cinnabar : theme.inkLight"
+        />
       </g>
 
-      <!-- 固定指针（红针标坐山/朝向） -->
+      <!-- 固定指针（红针标坐山/朝向）+ 对宫金点/山名 -->
       <path :d="pointerPath" :fill="theme.cinnabar" />
-      <!-- 对宫金点 + 对宫山名 -->
       <circle :cx="C" :cy="C + 212" r="5" :fill="theme.gold" />
       <text
         class="opposite-name"
@@ -117,15 +128,37 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { mountains } from '@/data/luopan';
+import RingLayer from './RingLayer.vue';
+import { RING_TYPES, modeRings } from '@/data/luopanRings';
+import {
+  mountains,
+  humanMountains,
+  heavenMountains,
+  solarTerms,
+  degreeTicks,
+} from '@/data/luopan';
+import { mansions } from '@/data/mansions';
+import { jiazi } from '@/data/jiazi';
+import { fuXiRing } from '@/utils/fuXiOrder';
 import { mountainAt, oppositeMountain } from '@/utils/fengShui';
+import {
+  termAt,
+  jiaziAt,
+  hexagramAt,
+  mansionAt,
+  plateMountainAt,
+} from '@/utils/luopanRead';
 import { theme } from '@/styles/theme';
-import { useCompassSensor, LEVEL_TOLERANCE } from '@/composables/useCompassSensor';
+import {
+  useCompassSensor,
+  LEVEL_TOLERANCE,
+} from '@/composables/useCompassSensor';
 
 const props = defineProps({
   mountain: { type: String, default: '子' },
+  mode: { type: String, default: 'ding' },
 });
-const emit = defineEmits(['select']);
+const emit = defineEmits(['select', 'readout']);
 
 const C = 260;
 const svgEl = ref(null);
@@ -147,8 +180,27 @@ const trigramAngles = [
   { name: '乾', trigram: '☰', num: '六', angle: 315 },
 ];
 
+// 顶参考线读值（连续角度，不吸附）
+const readAngle = computed(() => ((-rot.value % 360) + 360) % 360);
+const readout = computed(() => ({
+  angle: Math.round(readAngle.value) % 360,
+  degree: Math.round(readAngle.value) % 360,
+  mountain: mountainAt(readAngle.value),
+  term: termAt(readAngle.value),
+  human: plateMountainAt(readAngle.value, humanMountains),
+  heaven: plateMountainAt(readAngle.value, heavenMountains),
+  mansion: mansionAt(readAngle.value),
+  jiazi: jiaziAt(readAngle.value),
+  hexagram: hexagramAt(readAngle.value),
+}));
+
+watch(readout, (r) => emit('readout', r), { flush: 'post' });
+
+const activeRings = computed(() => modeRings[props.mode] || modeRings.ding);
+// 可点按的圈：三盘 24 山（点按即选定方向）
+const interactiveRings = ['earth', 'human', 'heaven'];
+
 const angleOf = (name) => mountains.find((m) => m.name === name)?.angle ?? 0;
-// computed 而非普通函数：模板 `{{ opposite }}` 会自动取 .value，普通函数会被渲染成源码字符串
 const opposite = computed(() => oppositeMountain(props.mountain));
 
 const pos = (a, r) => ({
@@ -156,11 +208,13 @@ const pos = (a, r) => ({
   y: C - r * Math.cos((a * Math.PI) / 180),
 });
 
-// 气泡偏移：倾斜度/容差 归一化后按像素钳制（符号待真机验证，必要时 dx 取反）
+// 气泡偏移（保留既有实现）
 const BUBBLE_MAX = 14;
 const clamp01 = (v) => Math.max(-1, Math.min(1, v));
 const bubbleDx = computed(() =>
-  gamma.value === null ? 0 : clamp01(-gamma.value / LEVEL_TOLERANCE) * BUBBLE_MAX
+  gamma.value === null
+    ? 0
+    : clamp01(-gamma.value / LEVEL_TOLERANCE) * BUBBLE_MAX
 );
 const bubbleDy = computed(() =>
   beta.value === null ? 0 : clamp01(beta.value / LEVEL_TOLERANCE) * BUBBLE_MAX
@@ -181,6 +235,61 @@ watch(
   },
   { immediate: true }
 );
+
+// 圈内容构建；高亮只在地盘（selectedDir 是地盘概念，人盘/天盘同山名不同位置不应高亮）
+function plateItems(plate, highlight) {
+  return plate.map((m) => ({
+    angle: m.angle,
+    text: m.name,
+    active: highlight && m.name === props.mountain,
+  }));
+}
+function ringItems(id) {
+  switch (id) {
+    case 'trigram':
+      return trigramAngles.map((t) => ({
+        angle: t.angle,
+        glyph: t.trigram,
+        sub: `${t.name}·${t.num}`,
+      }));
+    case 'terms':
+      return solarTerms.map((t) => ({ angle: t.angle, text: t.name }));
+    case 'mansions':
+      return mansions.map((m) => ({ angle: mansionAngle(m), text: m.name }));
+    case 'hexagrams':
+      return fuXiRing.map((h) => ({ angle: h.angle, binary: h.binary }));
+    case 'earth':
+      return plateItems(mountains, true);
+    case 'human':
+      return plateItems(humanMountains, false);
+    case 'heaven':
+      return plateItems(heavenMountains, false);
+    case 'jiazi':
+      return jiazi.map((j) => ({ angle: j.angle, text: j.name }));
+    case 'degrees':
+      return degreeTicks;
+    default:
+      return [];
+  }
+}
+
+// 二十八宿：古度比例归一至 360°，宿内居中放置标签
+function mansionAngle(m) {
+  const total = mansions.reduce((s, x) => s + x.degree, 0);
+  let before = 0;
+  for (const x of mansions) {
+    if (x === m) return ((before + x.degree / 2) / total) * 360;
+    before += x.degree;
+  }
+  return 0;
+}
+
+function onItemTap(item) {
+  if (sensorState.value === 'running') return;
+  if (item.text && mountains.some((m) => m.name === item.text)) {
+    select(item.text);
+  }
+}
 
 // 指针事件 → 山角坐标（0° 顶、顺时针）
 function angleOfPoint(e) {
@@ -227,24 +336,15 @@ function select(name) {
   user-select: none;
   touch-action: none;
 }
-.mountain-name {
-  font-size: 17px;
-  fill: var(--ink);
+.crosshair {
+  stroke: var(--gold);
+  stroke-opacity: 0.45;
+  stroke-width: 0.6;
   pointer-events: none;
 }
-.mountain-name.active {
-  fill: var(--cinnabar);
-  font-size: 19px;
-  font-weight: 700;
-}
-.tri-glyph {
-  font-size: 26px;
-  fill: var(--ink-light);
-  pointer-events: none;
-}
-.tri-sub {
-  font-size: 11px;
-  fill: var(--ink-light);
+.needle-line {
+  stroke: var(--cinnabar);
+  stroke-width: 1;
   pointer-events: none;
 }
 .opposite-name {
