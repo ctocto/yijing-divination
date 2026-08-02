@@ -67,6 +67,12 @@ import {
   judgeShui,
 } from '../src/utils/shui.js';
 import { jianChu, huangDao, termMonth } from '../src/data/zeriData.js';
+import {
+  drawLine,
+  lineName,
+  hexagramByBinary,
+  judgeChouYao,
+} from '../src/utils/yijing.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -663,6 +669,19 @@ check(
   termMonth['冬至'] === '子' && termMonth['小寒'] === '丑',
   '冬至子月小寒丑月'
 );
+
+// —— 易卦抽爻算法 ——
+check(drawLine('111111', 0) === '011111', '乾抽初爻应得天风姤 011111');
+check(drawLine('111111', 5) === '111110', '乾抽上爻应得泽天夬 111110');
+check(drawLine('000000', 0) === '100000', '坤抽初爻应得地雷复 100000');
+check(drawLine('000000', 5) === '000001', '坤抽上爻应得山地剥 000001');
+check(hexagramByBinary('011111').name === '姤', '011111 应查得天风姤');
+check(lineName('111111', 0) === '初九', '乾初爻应名初九');
+check(lineName('000000', 5) === '上六', '坤上爻应名上六');
+const chou = judgeChouYao('111111', 1);
+check(chou.ben === '乾' && chou.bian === '同人', '乾抽二爻变卦应为天火同人');
+check(chou.line.startsWith('九二'), '乾二爻爻辞应以九二起');
+check(chou.bianPlain.length > 0, '变卦应有白话解读');
 
 if (failed) process.exit(1);
 console.log(
