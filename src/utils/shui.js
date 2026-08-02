@@ -9,10 +9,11 @@ import {
 } from '../data/shuiData.js';
 
 // 角度 → 双山（按双山中心角循环距离取最近）
-// 注：双山 = 地支宫（30° 一宫），天盘缝针 +7.5° 与地盘在此口径下落在同一宫，定局结果一致，
-// 故直接用「角度 → 地支宫中心」判定，不依赖天/地盘偏移。坐山取地盘角，来水/去水取十字线角度。
+// 注：双山 = 地支宫（30° 一宫），中心角 = 地支宫中心（子0° 丑30° …）。坐山/来去水角按
+// 天盘缝针口径取（相对地盘 +7.5°），先偏移再找最近双山；否则 11 个天干/卦山（15° 45° …）
+// 恰落两双山正中，itemAt tie-break 会恒取角度小者而误归。
 export function shuangshanAt(deg) {
-  return itemAt(deg, shuangshan).name;
+  return itemAt(deg + 7.5, shuangshan).name;
 }
 
 // 坐山 → 双山 → 五行 → 定局（双山五行即局名：水/金/火/木）
@@ -51,8 +52,8 @@ export function judgeShui(shanDeg, inDeg, outDeg, flow) {
   const outPos = positionAt(map, outDeg);
   const inInfo = inPos ? CHANGSHENG_JUDGE[inPos] : null;
   const outInfo = outPos ? CHANGSHENG_JUDGE[outPos] : null;
-  const goodLai = ['长生', '冠带', '临官', '帝旺'].includes(inPos);
-  const goodQu = ['衰', '病', '死', '墓'].includes(outPos);
+  const goodLai = ['长生', '冠带', '临官', '帝旺', '衰', '养'].includes(inPos);
+  const goodQu = ['衰', '病', '死', '墓', '绝', '胎'].includes(outPos);
   const summary =
     goodLai && goodQu
       ? '迎生接旺，水归墓库，来去皆吉。'

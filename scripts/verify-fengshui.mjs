@@ -629,6 +629,12 @@ check(
 );
 check(r.inLai === '吉' && r.outQu === '吉', '长生来水吉 墓库去水吉');
 check(r.summary.includes('迎生接旺'), '总评应含迎生接旺');
+// 天盘缝针边界：11 个天干/卦山恰落两双山正中，+7.5° 后应归右（角大）双山
+check(shuangshanAt(15) === '癸丑', '坐癸(15°)天盘缝针应归癸丑双山');
+check(shuangshanAt(45) === '艮寅', '坐艮(45°)应归艮寅双山');
+check(shuangshanAt(165) === '丙午', '坐丙(165°)应归丙午双山');
+check(shuangshanAt(225) === '坤申', '坐坤(225°)应归坤申双山');
+check(shuangshanAt(315) === '乾亥', '坐乾(315°)应归乾亥双山');
 
 if (failed) process.exit(1);
 console.log(
