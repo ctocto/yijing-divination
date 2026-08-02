@@ -8,6 +8,7 @@ export const RING_TYPES = {
   human: { type: 'labels', radius: 198 }, // 人盘中针
   heaven: { type: 'labels', radius: 198 }, // 天盘缝针
   jiazi: { type: 'labels', radius: 208, labelSize: 10 }, // 六十甲子（6°/个，2 字须小字号避免重叠）
+  fenjin: { type: 'labels', radius: 212, labelSize: 10 }, // 120 分金·只标 48 旺相
   degrees: { type: 'ticks', radius: 220 }, // 周天度数
 };
 
@@ -20,7 +21,7 @@ export const MODES = [
 ];
 
 export const modeRings = {
-  ding: ['trigram', 'terms', 'earth', 'degrees'],
+  ding: ['trigram', 'terms', 'earth', 'fenjin', 'degrees'],
   xiao: ['trigram', 'mansions', 'human', 'degrees'],
   na: ['trigram', 'heaven', 'degrees'],
   ze: ['trigram', 'terms', 'jiazi'],

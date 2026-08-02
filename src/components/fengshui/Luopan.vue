@@ -142,7 +142,9 @@ import {
 } from '@/data/luopan';
 import { mansions } from '@/data/mansions';
 import { jiazi } from '@/data/jiazi';
+import { wangXiang48 } from '@/data/fenjin';
 import { fuXiRing } from '@/utils/fuXiOrder';
+import { fenjinAt } from '@/utils/fenjin';
 import { mountainAt, oppositeMountain } from '@/utils/fengShui';
 import {
   termAt,
@@ -160,6 +162,7 @@ import {
 const props = defineProps({
   mountain: { type: String, default: '子' },
   mode: { type: String, default: 'ding' },
+  fineAngle: { type: Number, default: null },
 });
 const emit = defineEmits(['select', 'readout']);
 
@@ -228,11 +231,18 @@ const pointerPath = `M ${C} 14 L ${C + 8} 46 L ${C} 30 L ${C - 8} 46 Z`;
 
 // 旋转来源：传感运行中跟随手机朝向（平滑），否则吸附到选中山
 watch(
-  [() => sensorState.value, () => heading.value, () => props.mountain],
+  [
+    () => sensorState.value,
+    () => heading.value,
+    () => props.mountain,
+    () => props.fineAngle,
+  ],
   () => {
     if (dragging.value) return;
     if (sensorState.value === 'running' && heading.value !== null) {
       rot.value = -heading.value;
+    } else if (props.fineAngle !== null) {
+      rot.value = -props.fineAngle;
     } else {
       rot.value = -angleOf(props.mountain);
     }
@@ -270,6 +280,16 @@ function ringItems(id) {
       return plateItems(heavenMountains, false);
     case 'jiazi':
       return jiazi.map((j) => ({ angle: j.angle, text: j.name }));
+    case 'fenjin': {
+      // 只标 48 旺相；当前十字线落在旺相槽则高亮
+      const cur = fenjinAt(readAngle.value);
+      const activeName = cur.type === 'kongwang' ? null : cur.name;
+      return wangXiang48.map((f) => ({
+        angle: f.angle,
+        text: f.name,
+        active: activeName === f.name,
+      }));
+    }
     case 'degrees':
       return degreeTicks;
     default:
@@ -320,7 +340,8 @@ function onMove(e) {
 function onUp() {
   if (!dragging.value) return;
   dragging.value = false;
-  const snapped = Math.round(rot.value / 15) * 15;
+  const step = props.mode === 'ding' ? 3 : 15;
+  const snapped = Math.round(rot.value / step) * step;
   rot.value = snapped;
   emit('select', mountainAt(-snapped));
 }
