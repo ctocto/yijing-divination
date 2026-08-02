@@ -35,13 +35,12 @@
         @pointerdown.stop="interactive && $emit('itemTap', it)"
       >
         <rect
-          v-if="it.active"
           x="-16"
           y="-14"
           width="32"
           height="30"
           rx="3"
-          :fill="activeFill"
+          :fill="it.active ? activeFill : 'transparent'"
         />
         <text :class="['label', { active: it.active }]">{{ it.text }}</text>
       </g>
