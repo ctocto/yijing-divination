@@ -79,6 +79,12 @@ import {
   jianChuIndex,
   judgeZeri,
 } from '../src/utils/zeri.js';
+import {
+  fenjin120,
+  wangXiang48,
+  FENJIN_ZHI,
+  GAN_SEQ,
+} from '../src/data/fenjin.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -707,6 +713,104 @@ check(zr.jianChu.name === '开', '寅月子日应为开日');
 check(zr.huangDao.name === '司命', '开日对应司命（黄道）');
 check(zr.huangDao.dao === '黄', '司命应为黄道');
 check(zr.nian === '海中金', '甲子纳音应海中金');
+
+// —— 120 分金数据 ——
+check(fenjin120.length === 120, `120 分金应 120 条，实为 ${fenjin120.length}`);
+check(
+  wangXiang48.length === 48,
+  `旺相分金应 48 个，实为 ${wangXiang48.length}`
+);
+check(Object.keys(FENJIN_ZHI).length === 24, '分金地支表应覆盖 24 山');
+check(
+  GAN_SEQ['阳'].join('') === '甲丙戊庚壬' &&
+    GAN_SEQ['阴'].join('') === '乙丁己辛癸',
+  '干序应为 阳甲丙戊庚壬/阴乙丁己辛癸'
+);
+// 每山恰 5 槽
+const fjByMountain = {};
+for (const f of fenjin120) (fjByMountain[f.mountain] ||= []).push(f);
+check(
+  Object.keys(fjByMountain).length === 24,
+  `分金应覆盖 24 山，实为 ${Object.keys(fjByMountain).length}`
+);
+for (const [m, arr] of Object.entries(fjByMountain)) {
+  check(arr.length === 5, `${m}山应有 5 分金，实为 ${arr.length}`);
+}
+// 角度无缝铺满 360°：120 个中心每 3° 一个
+const fjAngles = fenjin120.map((f) => f.angle).sort((a, b) => a - b);
+check(
+  fjAngles.every((a, i) => a === i * 3),
+  '分金槽中心应每 3° 连续铺满 0-357'
+);
+// level 分布：旺相48 / 孤24 / 虚24 / 龟甲24
+const fjDist = {};
+for (const f of fenjin120) fjDist[f.level] = (fjDist[f.level] || 0) + 1;
+check(fjDist['旺相'] === 48, `旺相应 48，实为 ${fjDist['旺相']}`);
+check(fjDist['孤'] === 24, `孤应 24，实为 ${fjDist['孤']}`);
+check(fjDist['虚'] === 24, `虚应 24，实为 ${fjDist['虚']}`);
+check(fjDist['龟甲'] === 24, `龟甲应 24，实为 ${fjDist['龟甲']}`);
+// 天干不变量
+const LEVEL_BY_GAN = {
+  甲: '孤',
+  壬: '孤',
+  乙: '虚',
+  癸: '虚',
+  戊: '龟甲',
+  己: '龟甲',
+  丙: '旺相',
+  丁: '旺相',
+  庚: '旺相',
+  辛: '旺相',
+};
+check(
+  fenjin120.every((f) => LEVEL_BY_GAN[f.gan] === f.level),
+  '分金吉凶应按天干口诀（甲壬孤/乙癸虚/戊己龟甲/丙丁庚辛旺相）'
+);
+// 子山五槽已知值
+const ziByName = Object.fromEntries(fjByMountain['子'].map((f) => [f.name, f]));
+check(
+  ziByName['甲子']?.angle === 354 &&
+    ziByName['甲子']?.level === '孤' &&
+    ziByName['甲子']?.nian === '海中金',
+  '子山甲子应 354° 孤·海中金'
+);
+check(
+  ziByName['丙子']?.angle === 357 &&
+    ziByName['丙子']?.level === '旺相' &&
+    ziByName['丙子']?.nian === '涧下水',
+  '子山丙子应 357° 旺相·涧下水'
+);
+check(
+  ziByName['戊子']?.angle === 0 &&
+    ziByName['戊子']?.level === '龟甲' &&
+    ziByName['戊子']?.nian === '霹雳火',
+  '子山戊子应 0° 龟甲·霹雳火'
+);
+check(
+  ziByName['庚子']?.angle === 3 &&
+    ziByName['庚子']?.level === '旺相' &&
+    ziByName['庚子']?.nian === '壁上土',
+  '子山庚子应 3° 旺相·壁上土'
+);
+check(
+  ziByName['壬子']?.angle === 6 &&
+    ziByName['壬子']?.level === '孤' &&
+    ziByName['壬子']?.nian === '桑柘木',
+  '子山壬子应 6° 孤·桑柘木'
+);
+// 巽山循辰山（前一位地支规则抽查：巽山旺相=丙辰/庚辰）
+const xunByName = Object.fromEntries(
+  fjByMountain['巽'].map((f) => [f.name, f])
+);
+check(
+  xunByName['丙辰']?.level === '旺相' && xunByName['庚辰']?.level === '旺相',
+  '巽山应循辰山（丙辰庚辰为旺相）'
+);
+// 槽名均存在于六十甲子（纳音查表不落空）
+check(
+  fenjin120.every((f) => jiazi.some((j) => j.name === f.name)),
+  '每个分金名都应存在于六十甲子'
+);
 
 if (failed) process.exit(1);
 console.log(
