@@ -180,6 +180,46 @@
         </section>
       </template>
 
+      <template v-else-if="luopanMode === 'xiao'">
+        <section class="fs-sha">
+          <h2>消砂判断</h2>
+          <p class="sha-shan">
+            坐山 {{ selectedDir }}（{{ shanSheng }}） · 线度五行 {{ shanLine }}
+          </p>
+          <p v-if="baShaInfo" class="sha-basha">
+            ⚠ 八煞：{{ baShaInfo.branch }}方（{{ baShaInfo.angle }}°）逢砂须忌
+          </p>
+          <table class="sha-table">
+            <thead>
+              <tr>
+                <th>方位</th>
+                <th>砂宿·五行</th>
+                <th>砂名</th>
+                <th>吉凶</th>
+                <th>应房</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="s in shaRows"
+                :key="s.deg"
+                :class="{ current: s.deg === currentDir }"
+              >
+                <td>{{ s.dir }}</td>
+                <td>{{ s.mansion }}·{{ s.shaWx }}</td>
+                <td>{{ s.name }}</td>
+                <td class="lvl" :class="`lv-${s.level}`">{{ s.level }}</td>
+                <td>{{ s.fang.join('/') }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p v-if="currentSha" class="sha-detail">
+            {{ currentSha.dir }}·{{ currentSha.name }}：{{ currentSha.text }}
+          </p>
+          <p class="fs-disclaimer">赖公砂法 · 文化参考</p>
+        </section>
+      </template>
+
       <section v-else class="fs-pending">
         <h2>判断区</h2>
         <p class="pending-text">
@@ -195,7 +235,14 @@ import { ref, computed, onBeforeUnmount } from 'vue';
 import Luopan from './Luopan.vue';
 import { MODES } from '@/data/luopanRings';
 import FlyingStarPan from './FlyingStarPan.vue';
-import { yunPeriods } from '@/data/luopan';
+import { yunPeriods, mountains } from '@/data/luopan';
+import {
+  judgeAllSha,
+  lineWuxingAt,
+  mansionShengAt,
+  baShaAt,
+  fenFang,
+} from '@/utils/sha';
 import {
   overallJudgments,
   specialPositions as spText,
@@ -248,6 +295,28 @@ const pendingText = computed(() => {
   };
   return map[luopanMode.value] || '';
 });
+
+// —— 消砂判断 ——
+const shanAngle = computed(() => {
+  const m = mountains.find((x) => x.name === selectedDir.value);
+  return m ? m.angle : 0;
+});
+// 坐山宿主五行 + 线度五行（读面板用）
+const shanSheng = computed(() => mansionShengAt(shanAngle.value));
+const shanLine = computed(() => lineWuxingAt(shanAngle.value));
+// 八方砂：坐山线度五行为主，八方砂宿主五行为宾
+const shaRows = computed(() =>
+  judgeAllSha(shanAngle.value).map((s) => ({ ...s, fang: fenFang(s.deg) }))
+);
+// 坐山八煞
+const baShaInfo = computed(() => baShaAt(shanAngle.value));
+// 当前十字线所指方位（吸附 45°）
+const currentDir = computed(
+  () => (Math.round((readout.value?.angle ?? 0) / 45) * 45) % 360
+);
+const currentSha = computed(() =>
+  shaRows.value.find((s) => s.deg === currentDir.value)
+);
 
 // 手机朝向对准：实时读数预览 + 手动锁定（锁定后写 selectedDir 走既有盘面链路）
 const {
@@ -382,6 +451,60 @@ onBeforeUnmount(stopCompass);
 .pending-text {
   font-size: 14px;
   color: var(--ink-light);
+}
+.fs-sha {
+  max-width: 560px;
+  margin: 0 auto;
+}
+.fs-sha h2 {
+  font-size: 16px;
+  color: var(--ink);
+  border-bottom: 1px dashed var(--gold);
+  padding-bottom: 6px;
+  letter-spacing: 0.12em;
+  margin: 20px 0 10px;
+}
+.sha-shan {
+  font-size: 14px;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+.sha-basha {
+  font-size: 13px;
+  color: var(--cinnabar);
+  margin: 0 0 10px;
+}
+.sha-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.sha-table th,
+.sha-table td {
+  padding: 6px 8px;
+  border-bottom: 1px dotted var(--gold-light);
+  text-align: center;
+}
+.sha-table th {
+  color: var(--ink-light);
+  font-weight: normal;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+.sha-table tr.current {
+  background: rgba(178, 58, 46, 0.08);
+}
+.sha-detail {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+  border: 1px solid var(--gold-light);
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: var(--scroll);
+  margin: 0 0 10px;
 }
 .period-row {
   display: flex;
