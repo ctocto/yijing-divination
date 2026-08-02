@@ -160,7 +160,7 @@ const pos = (a, r) => ({
 const BUBBLE_MAX = 14;
 const clamp01 = (v) => Math.max(-1, Math.min(1, v));
 const bubbleDx = computed(() =>
-  gamma.value === null ? 0 : clamp01(gamma.value / LEVEL_TOLERANCE) * BUBBLE_MAX
+  gamma.value === null ? 0 : clamp01(-gamma.value / LEVEL_TOLERANCE) * BUBBLE_MAX
 );
 const bubbleDy = computed(() =>
   beta.value === null ? 0 : clamp01(beta.value / LEVEL_TOLERANCE) * BUBBLE_MAX
