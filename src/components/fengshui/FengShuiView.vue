@@ -277,6 +277,60 @@
         </section>
       </template>
 
+      <template v-else-if="luopanMode === 'gua'">
+        <section class="fs-yijing">
+          <h2>抽爻换象</h2>
+          <p class="yi-ben">
+            本卦 <b>{{ benGuaName }}</b>
+          </p>
+          <div class="yi-lines" role="group" aria-label="六爻抽动">
+            <button
+              v-for="i in 6"
+              :key="i - 1"
+              type="button"
+              class="yi-line"
+              :class="{ active: movingYao === i - 1 }"
+              :aria-pressed="movingYao === i - 1"
+              @click="movingYao = i - 1"
+            >
+              {{ yaoLines[i - 1] }}
+            </button>
+          </div>
+          <p class="yi-hint">点选一爻为动爻</p>
+          <template v-if="chouYao">
+            <p class="yi-line-text">
+              动爻 <b>{{ chouYao.line }}</b>
+            </p>
+            <p class="yi-bian">
+              变卦 <b>{{ chouYao.bian }}</b> —— {{ chouYao.bianText }}（{{
+                chouYao.bianPlain
+              }}）
+            </p>
+          </template>
+          <p v-else class="yi-none">选一爻看变卦</p>
+          <p class="fs-disclaimer">六十四卦抽爻 · 文化参考</p>
+        </section>
+      </template>
+
+      <template v-else-if="luopanMode === 'ze'">
+        <section class="fs-zeri">
+          <h2>择日判断</h2>
+          <p class="zeri-head">
+            {{ readout?.term ?? '–' }} · {{ readout?.jiazi ?? '–' }}（{{
+              zeriInfo?.nian ?? '–'
+            }}）
+          </p>
+          <p class="zeri-main">
+            {{ zeriInfo?.monthB ?? '–' }}月 · {{ zeriInfo?.dayB ?? '–' }}日 ·
+            <b>{{ zeriInfo?.jianChu?.name ?? '–' }}</b
+            >日（{{ zeriInfo?.huangDao?.name ?? '–' }} ·
+            {{ zeriInfo?.huangDao?.dao ?? '–' }}道）
+          </p>
+          <p class="zeri-text">{{ zeriInfo?.jianChu?.text ?? '' }}</p>
+          <p class="fs-disclaimer">建除十二神 · 文化参考</p>
+        </section>
+      </template>
+
       <section v-else class="fs-pending">
         <h2>判断区</h2>
         <p class="pending-text">
@@ -288,7 +342,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import Luopan from './Luopan.vue';
 import { MODES } from '@/data/luopanRings';
 import FlyingStarPan from './FlyingStarPan.vue';
@@ -300,6 +354,9 @@ import {
   mansionShengAt,
   baShaAt,
 } from '@/utils/sha';
+import { hexagrams } from '@/data/hexagrams';
+import { judgeChouYao } from '@/utils/yijing';
+import { judgeZeri } from '@/utils/zeri';
 import {
   overallJudgments,
   specialPositions as spText,
@@ -382,6 +439,39 @@ const shuiInfo = computed(() =>
   inAngle.value !== null && outAngle.value !== null
     ? judgeShui(shanAngle.value, inAngle.value, outAngle.value, flow.value)
     : null
+);
+
+// —— 易卦抽爻 ——
+const movingYao = ref(null); // 动爻位 0=初爻 … 5=上爻
+const benGuaName = computed(() => readout.value?.hexagram ?? '–');
+// 卦名 → 本卦 binary（卦名唯一）
+const benBinary = computed(
+  () => hexagrams.find((h) => h.name === readout.value?.hexagram)?.binary ?? ''
+);
+// 六爻横条：显示位序 = binary 位序（i=0 初爻在左，i=5 上爻在右），点击索引即显示位序，无错位
+const yaoLines = computed(() => {
+  if (!benBinary.value) return ['—', '—', '—', '—', '—', '—'];
+  return benBinary.value.split('').map((b) => (b === '1' ? '—' : '--'));
+});
+const chouYao = computed(() =>
+  movingYao.value !== null && benBinary.value
+    ? judgeChouYao(benBinary.value, movingYao.value)
+    : null
+);
+
+// —— 择日 ——
+const zeriInfo = computed(() =>
+  readout.value?.term && readout.value?.jiazi
+    ? judgeZeri(readout.value.term, readout.value.jiazi)
+    : null
+);
+
+// 换坐向卦时清空动爻
+watch(
+  () => readout.value?.hexagram,
+  () => {
+    movingYao.value = null;
+  }
 );
 
 // 手机朝向对准：实时读数预览 + 手动锁定（锁定后写 selectedDir 走既有盘面链路）
@@ -517,6 +607,68 @@ onBeforeUnmount(stopCompass);
 .pending-text {
   font-size: 14px;
   color: var(--ink-light);
+}
+.fs-yijing,
+.fs-zeri {
+  border-top: 1px solid var(--gold);
+  padding: 14px 2px;
+}
+.yi-ben {
+  font-size: 15px;
+  color: var(--deep-ink);
+}
+.yi-lines {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 10px 0 6px;
+}
+.yi-line {
+  width: 44px;
+  height: 40px;
+  font-size: 20px;
+  line-height: 1;
+  font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
+  color: var(--deep-ink);
+  background: var(--scroll);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.yi-line.active {
+  background: var(--cinnabar);
+  color: #faf3e8;
+}
+.yi-hint {
+  font-size: 12px;
+  color: var(--ink-light);
+}
+.yi-line-text {
+  margin-top: 10px;
+  font-size: 14px;
+}
+.yi-bian {
+  font-size: 14px;
+  color: var(--deep-ink);
+  margin-top: 6px;
+}
+.yi-none {
+  color: var(--ink-light);
+  font-size: 13px;
+  margin-top: 8px;
+}
+.zeri-head {
+  font-size: 14px;
+  color: var(--ink-light);
+}
+.zeri-main {
+  font-size: 15px;
+  color: var(--deep-ink);
+  margin-top: 6px;
+}
+.zeri-text {
+  font-size: 14px;
+  margin-top: 6px;
 }
 .fs-sha {
   max-width: 560px;
