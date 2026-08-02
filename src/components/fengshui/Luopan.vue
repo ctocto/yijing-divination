@@ -110,6 +110,7 @@ import { ref, computed, watch } from 'vue';
 import { mountains } from '@/data/luopan';
 import { mountainAt, oppositeMountain } from '@/utils/fengShui';
 import { theme } from '@/styles/theme';
+import { useCompassSensor, LEVEL_TOLERANCE } from '@/composables/useCompassSensor';
 
 const props = defineProps({
   mountain: { type: String, default: '子' },
@@ -120,6 +121,7 @@ const C = 260;
 const svgEl = ref(null);
 const dragging = ref(false);
 const rot = ref(0);
+const { state: sensorState, heading, beta, gamma, level } = useCompassSensor();
 let startAngle = 0;
 let startRot = 0;
 
@@ -146,11 +148,16 @@ const pos = (a, r) => ({
 
 const pointerPath = `M ${C} 14 L ${C + 9} 34 L ${C} 27 L ${C - 9} 34 Z`;
 
-// 从外部同步旋转（选中/父组件驱动）
+// 旋转来源：传感运行中跟随手机朝向（平滑），否则吸附到选中山
 watch(
-  () => props.mountain,
-  (m) => {
-    if (!dragging.value) rot.value = -angleOf(m);
+  [() => sensorState.value, () => heading.value, () => props.mountain],
+  () => {
+    if (dragging.value) return;
+    if (sensorState.value === 'running' && heading.value !== null) {
+      rot.value = -heading.value;
+    } else {
+      rot.value = -angleOf(props.mountain);
+    }
   },
   { immediate: true }
 );
@@ -164,6 +171,7 @@ function angleOfPoint(e) {
 }
 
 function onDown(e) {
+  if (sensorState.value === 'running') return;
   dragging.value = true;
   startAngle = angleOfPoint(e);
   startRot = rot.value;
@@ -185,6 +193,7 @@ function onUp() {
 }
 
 function select(name) {
+  if (sensorState.value === 'running') return;
   rot.value = -angleOf(name);
   emit('select', name);
 }
