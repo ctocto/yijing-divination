@@ -18,6 +18,12 @@ import {
   palaceJudges,
 } from '../src/utils/fengShui.js';
 import { fuXiRing } from '../src/utils/fuXiOrder.js';
+import {
+  humanMountains,
+  heavenMountains,
+  solarTerms,
+  degreeTicks,
+} from '../src/data/luopan.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -243,6 +249,51 @@ check(
   ringAngles.every((a, i) => a === i * (360 / 64)),
   '先天卦环角度应每 5.625° 连续'
 );
+
+// —— 三盘三针 ——
+check(
+  humanMountains.length === 24,
+  `人盘中针应 24 山，实为 ${humanMountains.length}`
+);
+check(
+  heavenMountains.length === 24,
+  `天盘缝针应 24 山，实为 ${heavenMountains.length}`
+);
+check(
+  humanMountains.every(
+    (m) => m.name === mountains[humanMountains.indexOf(m)].name
+  ),
+  '人盘中针山名应与地盘一致'
+);
+check(
+  humanMountains[0].angle === 352.5,
+  `人盘中针子山应为 352.5°（-7.5），实为 ${humanMountains[0].angle}`
+);
+check(
+  heavenMountains[0].angle === 7.5,
+  `天盘缝针子山应为 7.5°（+7.5），实为 ${heavenMountains[0].angle}`
+);
+
+// —— 二十四节气 ——
+check(
+  solarTerms.length === 24,
+  `二十四节气应为 24 条，实为 ${solarTerms.length}`
+);
+check(
+  solarTerms[0].name === '冬至' && solarTerms[0].angle === 0,
+  '冬至应在 0°'
+);
+check(
+  solarTerms.every((t, i) => t.angle === i * 15),
+  '二十四节气应每 15° 连续'
+);
+
+// —— 周天度数 ——
+check(
+  degreeTicks.length === 360,
+  `周天度数应为 360 刻度，实为 ${degreeTicks.length}`
+);
+check(degreeTicks[0].big && degreeTicks[0].label === '0', '0° 应为大字标注');
 
 if (failed) process.exit(1);
 console.log('✓ 二十四山结构 / 三元九运 / 断语表完整性 校验通过');

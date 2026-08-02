@@ -25,7 +25,7 @@ export const mountains = [
   { name: '乾', palace: '乾', dragon: '天', yinYang: '阳', angle: 315 },
   { name: '亥', palace: '乾', dragon: '人', yinYang: '阳', angle: 330 },
   { name: '壬', palace: '坎', dragon: '地', yinYang: '阳', angle: 345 },
-]
+];
 
 // 三元九运年份区间
 export const yunPeriods = [
@@ -38,4 +38,52 @@ export const yunPeriods = [
   { period: 7, start: 1984, end: 2003, yuan: '下元' },
   { period: 8, start: 2004, end: 2023, yuan: '下元' },
   { period: 9, start: 2024, end: 2043, yuan: '下元' },
-]
+];
+
+// 三盘三针：地盘正针 = 上表 mountains；人盘中针/天盘缝针 为 24 山整体偏移
+// 人盘中针（消砂用）相对地盘逆时针偏 7.5°；天盘缝针（纳水用）相对地盘顺时针偏 7.5°
+export const humanMountains = mountains.map((m) => ({
+  ...m,
+  angle: (m.angle - 7.5 + 360) % 360,
+}));
+
+export const heavenMountains = mountains.map((m) => ({
+  ...m,
+  angle: (m.angle + 7.5) % 360,
+}));
+
+// 二十四节气：每 15°，冬至在 0°（子位），顺时针
+export const solarTerms = [
+  '冬至',
+  '小寒',
+  '大寒',
+  '立春',
+  '雨水',
+  '惊蛰',
+  '春分',
+  '清明',
+  '谷雨',
+  '立夏',
+  '小满',
+  '芒种',
+  '夏至',
+  '小暑',
+  '大暑',
+  '立秋',
+  '处暑',
+  '白露',
+  '秋分',
+  '寒露',
+  '霜降',
+  '立冬',
+  '小雪',
+  '大雪',
+].map((name, i) => ({ name, angle: i * 15 }));
+
+// 周天度数：每 1° 刻度，15° 主刻度，90° 大字标注
+export const degreeTicks = Array.from({ length: 360 }, (_, i) => ({
+  angle: i,
+  major: i % 15 === 0,
+  big: i % 90 === 0,
+  label: i % 90 === 0 ? String(i) : '',
+}));
