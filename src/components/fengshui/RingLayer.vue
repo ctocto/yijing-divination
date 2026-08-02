@@ -15,8 +15,8 @@
       <text
         v-for="(it, i) in bigItems"
         :key="'t' + i"
-        :x="pos(it.angle, radius - 16).x"
-        :y="pos(it.angle, radius - 16).y"
+        :x="pos(it.angle, radius - 1).x"
+        :y="pos(it.angle, radius - 1).y"
         text-anchor="middle"
         dominant-baseline="central"
         class="deg-label"
@@ -110,7 +110,7 @@ const activeFill = 'rgba(178,58,46,0.14)';
   font-weight: 700;
 }
 .deg-label {
-  font-size: 11px;
+  font-size: 8px;
   fill: var(--gold);
   pointer-events: none;
 }

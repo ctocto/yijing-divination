@@ -304,6 +304,14 @@ check(
   `周天度数应为 360 刻度，实为 ${degreeTicks.length}`
 );
 check(degreeTicks[0].big && degreeTicks[0].label === '0', '0° 应为大字标注');
+check(
+  degreeTicks.filter((t) => t.major).length === 24,
+  `15° 主刻度应 24 个，实为 ${degreeTicks.filter((t) => t.major).length}`
+);
+check(
+  degreeTicks.filter((t) => t.big).length === 4,
+  `90° 大字应 4 个，实为 ${degreeTicks.filter((t) => t.big).length}`
+);
 
 // —— 二十八宿 ——
 check(mansions.length === 28, `二十八宿应为 28 条，实为 ${mansions.length}`);
@@ -316,6 +324,11 @@ check(
 );
 const names = mansions.map((m) => m.name);
 check(new Set(names).size === 28, '二十八宿宿名不应重复');
+// 四象各恰 7 宿
+for (const x of xiangSet) {
+  const cnt = mansions.filter((m) => m.xiang === x).length;
+  check(cnt === 7, `${x} 应恰 7 宿，实为 ${cnt}`);
+}
 
 // —— 六十甲子 ——
 check(jiazi.length === 60, `六十甲子应为 60 条，实为 ${jiazi.length}`);
@@ -328,6 +341,19 @@ check(
   jiazi.every((j) => j.nian && j.nian.length > 0),
   '每柱应有纳音'
 );
+// 每两柱共享同一纳音（甲子/乙丑同、丙寅/丁卯同…），相邻组纳音不同
+for (let i = 0; i < jiazi.length; i += 2) {
+  check(
+    jiazi[i].nian === jiazi[i + 1].nian,
+    `${jiazi[i].name} 与 ${jiazi[i + 1].name} 应共享纳音`
+  );
+  if (i + 2 < jiazi.length) {
+    check(
+      jiazi[i].nian !== jiazi[i + 2].nian,
+      `${jiazi[i].name} 与 ${jiazi[i + 2].name} 相邻组纳音应不同`
+    );
+  }
+}
 
 // —— 读数工具 ——
 check(termAt(0) === '冬至', '0° 节气应为冬至');
@@ -353,4 +379,6 @@ check(modeRings.ding.includes('earth'), '定向模式应含地盘正针');
 check(modeRings.gua.includes('hexagrams'), '易卦模式应含六十四卦');
 
 if (failed) process.exit(1);
-console.log('✓ 二十四山结构 / 三元九运 / 断语表完整性 校验通过');
+console.log(
+  '✓ 二十四山/三盘三针/节气/度数/二十八宿/六十甲子/卦环/读数/圈映射/飞星逻辑 校验通过'
+);

@@ -1,5 +1,5 @@
 // 罗盘按角度读数（纯函数，不触碰 DOM，node 脚本可直接 import 校验）
-import { humanMountains, heavenMountains, solarTerms } from '../data/luopan.js';
+import { solarTerms } from '../data/luopan.js';
 import { mansions } from '../data/mansions.js';
 import { jiazi } from '../data/jiazi.js';
 import { fuXiRing } from './fuXiOrder.js';

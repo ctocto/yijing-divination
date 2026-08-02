@@ -25,10 +25,6 @@
         stroke-dasharray="2 5"
       />
 
-      <!-- 天心十道（固定，压圈之上） -->
-      <line :x1="C - 224" :y1="C" :x2="C + 224" :y2="C" class="crosshair" />
-      <line :x1="C" :y1="C - 224" :x2="C" :y2="C + 224" class="crosshair" />
-
       <!-- 旋转内盘：圈配置驱动 -->
       <g :transform="`rotate(${rot} ${C} ${C})`">
         <!-- 拖拽命中圈（透明整圆） -->
@@ -56,6 +52,10 @@
           />
         </g>
       </g>
+
+      <!-- 天心十道（固定，压圈之上：旋转内盘之后、天池之前） -->
+      <line :x1="C - 224" :y1="C" :x2="C + 224" :y2="C" class="crosshair" />
+      <line :x1="C" :y1="C - 224" :x2="C" :y2="C + 224" class="crosshair" />
 
       <!-- 天池（盘心，固定） -->
       <g class="tianchi" aria-hidden="true">
@@ -116,7 +116,7 @@
       <text
         class="opposite-name"
         :x="C"
-        :y="C + 230"
+        :y="C + 240"
         text-anchor="middle"
         dominant-baseline="central"
       >
@@ -194,7 +194,7 @@ const readout = computed(() => ({
   hexagram: hexagramAt(readAngle.value),
 }));
 
-watch(readout, (r) => emit('readout', r), { flush: 'post' });
+watch(readout, (r) => emit('readout', r), { immediate: true, flush: 'post' });
 
 const activeRings = computed(() => modeRings[props.mode] || modeRings.ding);
 // 可点按的圈：三盘 24 山（点按即选定方向）

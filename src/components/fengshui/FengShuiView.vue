@@ -330,6 +330,7 @@ onBeforeUnmount(stopCompass);
   text-align: center;
   margin-bottom: 14px;
 }
+.mode-switch,
 .mode-toggle {
   display: inline-flex;
   border: 1px solid var(--gold);
@@ -337,28 +338,8 @@ onBeforeUnmount(stopCompass);
   overflow: hidden;
   margin-bottom: 12px;
 }
+.mode-switch button,
 .mode-toggle button {
-  padding: 7px 22px;
-  font-size: 14px;
-  color: var(--ink-light);
-  background: var(--scroll);
-  border: none;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-}
-.mode-toggle button.active {
-  background: var(--cinnabar);
-  color: #faf3e8;
-}
-.mode-switch {
-  display: inline-flex;
-  border: 1px solid var(--gold);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-.mode-switch button {
   padding: 7px 14px;
   font-size: 14px;
   color: var(--ink-light);
@@ -368,7 +349,11 @@ onBeforeUnmount(stopCompass);
     background-color 0.2s,
     color 0.2s;
 }
-.mode-switch button.active {
+.mode-toggle button {
+  padding: 7px 22px;
+}
+.mode-switch button.active,
+.mode-toggle button.active {
   background: var(--cinnabar);
   color: #faf3e8;
 }
