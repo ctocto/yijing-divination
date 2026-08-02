@@ -17,4 +17,7 @@ export interface ChouYaoResult {
   bianText: string;
   bianPlain: string;
 }
-export function judgeChouYao(binary: string, index: number): ChouYaoResult;
+export function judgeChouYao(
+  binary: string,
+  index: number
+): ChouYaoResult | null;

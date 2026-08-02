@@ -6,15 +6,18 @@ const POSITIONS = ['初', '二', '三', '四', '五', '上'];
 
 // 抽动爻：index 0=初爻 … 5=上爻，该位 0↔1 翻转
 export function drawLine(binary, index) {
+  if (index < 0 || index > 5) return binary;
   const arr = binary.split('');
   arr[index] = arr[index] === '1' ? '0' : '1';
   return arr.join('');
 }
 
-// 爻名：位序 + 阴阳 → 初九/六二/…/上六
+// 爻名：初/上两爻「位序+阴阳」（初九/上六），中位爻「阴阳+位序」（九二/六二）
 export function lineName(binary, index) {
+  if (index < 0 || index > 5) return '';
   const yinYang = binary[index] === '1' ? '九' : '六';
-  return POSITIONS[index] + yinYang;
+  if (index === 0 || index === 5) return POSITIONS[index] + yinYang;
+  return yinYang + POSITIONS[index];
 }
 
 // 找卦：binary → hexagram 对象
@@ -27,6 +30,7 @@ export function hexagramByBinary(binary) {
 export function judgeChouYao(binary, index) {
   const ben = hexagramByBinary(binary);
   const bian = hexagramByBinary(drawLine(binary, index));
+  if (!ben || !bian) return null;
   return {
     ben: ben.name,
     benPlain: ben.plain,

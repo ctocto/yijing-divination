@@ -678,10 +678,14 @@ check(drawLine('000000', 5) === '000001', '坤抽上爻应得山地剥 000001');
 check(hexagramByBinary('011111').name === '姤', '011111 应查得天风姤');
 check(lineName('111111', 0) === '初九', '乾初爻应名初九');
 check(lineName('000000', 5) === '上六', '坤上爻应名上六');
+check(lineName('111111', 1) === '九二', '乾二爻应名九二（中位阴阳在前）');
+check(lineName('000000', 1) === '六二', '坤二爻应名六二');
+check(drawLine('111111', 6) === '111111', '越界 index 应原样返回');
 const chou = judgeChouYao('111111', 1);
 check(chou.ben === '乾' && chou.bian === '同人', '乾抽二爻变卦应为天火同人');
 check(chou.line.startsWith('九二'), '乾二爻爻辞应以九二起');
 check(chou.bianPlain.length > 0, '变卦应有白话解读');
+check(judgeChouYao('00000', 3) === null, '非法 binary 应返回 null 而非抛错');
 
 if (failed) process.exit(1);
 console.log(
