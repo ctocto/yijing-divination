@@ -12,6 +12,7 @@ export type RingId =
 export interface RingSpec {
   type: RingType;
   radius: number;
+  labelSize?: number; // labels 圈字号覆盖（默认 17）
 }
 export type ModeId = 'ding' | 'xiao' | 'na' | 'ze' | 'gua';
 export interface ModeSpec {

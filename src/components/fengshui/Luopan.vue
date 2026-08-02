@@ -48,6 +48,7 @@
             :radius="RING_TYPES[rid].radius"
             :items="ringItems(rid)"
             :interactive="interactiveRings.includes(rid)"
+            :label-size="RING_TYPES[rid].labelSize || 0"
             @item-tap="onItemTap"
           />
         </g>

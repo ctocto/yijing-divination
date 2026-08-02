@@ -7,7 +7,7 @@ export const RING_TYPES = {
   earth: { type: 'labels', radius: 198 }, // 地盘正针
   human: { type: 'labels', radius: 198 }, // 人盘中针
   heaven: { type: 'labels', radius: 198 }, // 天盘缝针
-  jiazi: { type: 'labels', radius: 198 }, // 六十甲子
+  jiazi: { type: 'labels', radius: 208, labelSize: 10 }, // 六十甲子（6°/个，2 字须小字号避免重叠）
   degrees: { type: 'ticks', radius: 220 }, // 周天度数
 };
 

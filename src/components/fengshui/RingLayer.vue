@@ -42,7 +42,11 @@
           rx="3"
           :fill="it.active ? activeFill : 'transparent'"
         />
-        <text :class="['label', { active: it.active }]">{{ it.text }}</text>
+        <text
+          :class="['label', { active: it.active }]"
+          :style="labelSize ? { fontSize: labelSize + 'px' } : null"
+          >{{ it.text }}</text
+        >
       </g>
     </template>
 
@@ -83,6 +87,7 @@ const props = defineProps({
   radius: { type: Number, required: true },
   items: { type: Array, default: () => [] },
   interactive: { type: Boolean, default: false },
+  labelSize: { type: Number, default: 0 }, // 0 = 用样式默认字号
 });
 defineEmits(['itemTap']);
 
