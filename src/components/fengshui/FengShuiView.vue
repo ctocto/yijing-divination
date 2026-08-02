@@ -17,6 +17,7 @@
         <Luopan
           :mountain="selectedDir"
           :mode="luopanMode"
+          :fine-angle="luopanMode === 'ding' ? fineAngle : null"
           @select="selectedDir = $event"
           @readout="readout = $event"
         />
@@ -106,7 +107,11 @@
 
         <p class="readout">
           <template v-if="luopanMode === 'ding'"
-            >坐{{ shan }}朝{{ xiang }}</template
+            >坐{{ shan }}·{{ fenjin?.shan.name ?? '骑缝' }}({{
+              fenjin?.shan.level ?? '–'
+            }}) 朝{{ xiang }}·{{ fenjin?.xiang.name ?? '骑缝' }}({{
+              fenjin?.xiang.level ?? '–'
+            }})</template
           >
           <template v-else-if="luopanMode === 'xiao'"
             >人盘 {{ readout?.human ?? '–' }} · 宿
@@ -145,6 +150,36 @@
       <template v-if="luopanMode === 'ding'">
         <section class="fs-pan">
           <FlyingStarPan :judges="judges" :special="special" />
+        </section>
+
+        <section class="fs-fenjin">
+          <h2>分金吉凶</h2>
+          <p class="fj-hint">点按居中即正向·龟甲，拖拽微调至旺相分金</p>
+          <template v-if="fenjin">
+            <p class="fj-row">
+              坐分金：<b>{{ fenjin.shan.name }}</b
+              >（{{ fenjin.shan.nian || '—' }}）·
+              <span
+                class="fj-level"
+                :class="fenjin.shan.ji === '吉' ? 'fj-gold' : 'fj-bad'"
+                >{{ fenjin.shan.level }}</span
+              >
+              · {{ fenjin.shan.ji }}
+            </p>
+            <p class="fj-text">{{ fenjin.shan.text }}</p>
+            <p class="fj-row">
+              向分金：<b>{{ fenjin.xiang.name }}</b
+              >（{{ fenjin.xiang.nian || '—' }}）·
+              <span
+                class="fj-level"
+                :class="fenjin.xiang.ji === '吉' ? 'fj-gold' : 'fj-bad'"
+                >{{ fenjin.xiang.level }}</span
+              >
+              · {{ fenjin.xiang.ji }}
+            </p>
+            <p class="fj-text">{{ fenjin.xiang.text }}</p>
+          </template>
+          <p class="fs-disclaimer">一百二十分金 · 文化参考</p>
         </section>
 
         <section class="fs-reading">
@@ -357,6 +392,7 @@ import {
 import { hexagrams } from '@/data/hexagrams';
 import { judgeChouYao } from '@/utils/yijing';
 import { judgeZeri } from '@/utils/zeri';
+import { judgeFenjin } from '@/utils/fenjin';
 import {
   overallJudgments,
   specialPositions as spText,
@@ -378,6 +414,27 @@ const selectedDir = ref('子'); // 红针所指 24 山（默认坐子朝午）
 const period = ref(9); // 默认九运（2024-2043）
 const luopanMode = ref('ding'); // 定向 | 消砂 | 纳水 | 择日 | 易卦
 const readout = ref(null); // Luopan 读数
+
+// —— 分金（定向模式立向精度）——
+// 十字线实时角度作为分金定位源；传感运行/拖拽/锁定都经 readout.angle 同步
+const fineAngle = ref(null);
+watch(
+  () => readout.value?.angle,
+  (a) => {
+    if (luopanMode.value === 'ding' && a !== undefined) fineAngle.value = a;
+  }
+);
+// 离开定向模式归位山中心，不污染其他模式
+watch(
+  () => luopanMode.value,
+  (m) => {
+    if (m !== 'ding') fineAngle.value = null;
+  }
+);
+// 分金判断：坐 = 十字线角度，向 = +180°
+const fenjin = computed(() =>
+  readout.value?.angle !== undefined ? judgeFenjin(readout.value.angle) : null
+);
 
 // 坐山/朝向：口径切换只改解释，山盘/向盘始终用坐山/朝向
 const shan = computed(() =>
@@ -496,6 +553,7 @@ function lockCompass() {
 
 function stopSensor() {
   stopCompass();
+  fineAngle.value = null; // 取消传感：归位已锁定山中心
 }
 
 // 离开页面即停止监听，避免后台耗电
@@ -978,6 +1036,46 @@ onBeforeUnmount(stopCompass);
   line-height: 1.9;
   color: var(--ink);
   padding: 6px 0;
+}
+.fs-fenjin {
+  border-top: 1px solid var(--gold);
+  padding: 14px 2px;
+}
+.fs-fenjin h2 {
+  font-size: 16px;
+  color: var(--ink);
+  border-bottom: 1px dashed var(--gold);
+  padding-bottom: 6px;
+  letter-spacing: 0.12em;
+  margin: 20px 0 10px;
+}
+.fj-hint {
+  font-size: 12px;
+  color: var(--ink-light);
+}
+.fj-row {
+  font-size: 14px;
+  color: var(--deep-ink);
+  margin-top: 8px;
+}
+.fj-row b {
+  color: var(--cinnabar);
+}
+.fj-text {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin-top: 2px;
+}
+.fj-level {
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+.fj-gold {
+  color: var(--gold);
+}
+.fj-bad {
+  color: var(--ink-light);
 }
 .fs-disclaimer {
   margin-top: 24px;
