@@ -19,6 +19,7 @@
           :mode="luopanMode"
           :fine-angle="luopanMode === 'ding' ? fineAngle : null"
           @select="selectedDir = $event"
+          @settle="onSettleMountain"
           @readout="readout = $event"
         />
       </section>
@@ -544,6 +545,13 @@ const {
 const liveName = computed(() =>
   compassHeading.value === null ? '' : mountainAt(compassHeading.value)
 );
+
+// 点按选山（settle）：归位该山中心（龟甲）并清空拖拽/传感残留细角；
+// 与拖拽释放的 select 区分——select 保留 3° 分金细角，settle 才重置归中
+function onSettleMountain(name) {
+  selectedDir.value = name;
+  fineAngle.value = null;
+}
 
 function lockCompass() {
   if (compassHeading.value === null) return;

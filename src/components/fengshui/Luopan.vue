@@ -164,7 +164,7 @@ const props = defineProps({
   mode: { type: String, default: 'ding' },
   fineAngle: { type: Number, default: null },
 });
-const emit = defineEmits(['select', 'readout']);
+const emit = defineEmits(['select', 'settle', 'readout']);
 
 const C = 270;
 const svgEl = ref(null);
@@ -349,7 +349,7 @@ function onUp() {
 function select(name) {
   if (sensorState.value === 'running') return;
   rot.value = -angleOf(name);
-  emit('select', name);
+  emit('settle', name);
 }
 </script>
 
