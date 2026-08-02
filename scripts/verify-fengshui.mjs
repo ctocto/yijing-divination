@@ -73,6 +73,12 @@ import {
   hexagramByBinary,
   judgeChouYao,
 } from '../src/utils/yijing.js';
+import {
+  dayBranch,
+  monthBranch,
+  jianChuIndex,
+  judgeZeri,
+} from '../src/utils/zeri.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -686,6 +692,21 @@ check(chou.ben === '乾' && chou.bian === '同人', '乾抽二爻变卦应为天
 check(chou.line.startsWith('九二'), '乾二爻爻辞应以九二起');
 check(chou.bianPlain.length > 0, '变卦应有白话解读');
 check(judgeChouYao('00000', 3) === null, '非法 binary 应返回 null 而非抛错');
+
+// —— 择日算法 ——
+check(dayBranch('甲子') === '子', '甲子日支应子');
+check(dayBranch('癸亥') === '亥', '癸亥日支应亥');
+check(monthBranch('立春') === '寅', '立春月建应寅');
+check(monthBranch('雨水') === '寅', '雨水月建应寅（中气同节）');
+check(monthBranch('冬至') === '子', '冬至月建应子');
+check(jianChuIndex('寅', '子') === 10, '寅月子日序差应 10（开日）');
+check(jianChuIndex('午', '午') === 0, '午月午日序差应 0（建日）');
+const zr = judgeZeri('立春', '甲子');
+check(zr.monthB === '寅' && zr.dayB === '子', '立春甲子应为寅月子日');
+check(zr.jianChu.name === '开', '寅月子日应为开日');
+check(zr.huangDao.name === '司命', '开日对应司命（黄道）');
+check(zr.huangDao.dao === '黄', '司命应为黄道');
+check(zr.nian === '海中金', '甲子纳音应海中金');
 
 if (failed) process.exit(1);
 console.log(
