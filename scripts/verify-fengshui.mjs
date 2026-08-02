@@ -18,6 +18,7 @@ import {
   palaceJudges,
 } from '../src/utils/fengShui.js';
 import { fuXiRing } from '../src/utils/fuXiOrder.js';
+import { mansions } from '../src/data/mansions.js';
 import {
   humanMountains,
   heavenMountains,
@@ -294,6 +295,18 @@ check(
   `周天度数应为 360 刻度，实为 ${degreeTicks.length}`
 );
 check(degreeTicks[0].big && degreeTicks[0].label === '0', '0° 应为大字标注');
+
+// —— 二十八宿 ——
+check(mansions.length === 28, `二十八宿应为 28 条，实为 ${mansions.length}`);
+const xiangSet = new Set(mansions.map((m) => m.xiang));
+check(xiangSet.size === 4, `二十八宿应分四象，实为 ${xiangSet.size} 象`);
+const sumDeg = mansions.reduce((s, m) => s + m.degree, 0);
+check(
+  sumDeg >= 355 && sumDeg <= 370,
+  `二十八宿古度和应约 360（含闰度），实为 ${sumDeg}`
+);
+const names = mansions.map((m) => m.name);
+check(new Set(names).size === 28, '二十八宿宿名不应重复');
 
 if (failed) process.exit(1);
 console.log('✓ 二十四山结构 / 三元九运 / 断语表完整性 校验通过');
