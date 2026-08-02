@@ -15,7 +15,7 @@ export const JUS: Ju[];
 export const CHANGSHENG_ORDER: string[];
 export interface ChangshengJudge {
   lai: '吉' | '凶' | '慎';
-  qu: '吉' | '凶' | '慎';
+  qu: '吉' | '凶' | '慎' | '忌';
   text: string;
 }
 export const CHANGSHENG_JUDGE: Record<string, ChangshengJudge>;

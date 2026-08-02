@@ -65,7 +65,7 @@ export const CHANGSHENG_ORDER = [
   '养',
 ];
 
-// 吉凶断语（lai = 来水档位，qu = 去水档位：吉/凶/慎）
+// 吉凶断语（lai = 来水档位，qu = 去水档位：吉/凶/慎/忌）
 export const CHANGSHENG_JUDGE = {
   长生: {
     lai: '吉',
