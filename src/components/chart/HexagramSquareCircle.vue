@@ -28,7 +28,7 @@
       v-for="item in circleItems"
       :key="'c-' + item.name"
       class="glyph-slot"
-      :transform="`translate(${item.x}, ${item.y})`"
+      :transform="`translate(${item.x}, ${item.y}) rotate(${item.angle})`"
       @click="onClick(item.name)"
       @mouseenter="onEnter(item.name)"
     >
@@ -126,10 +126,11 @@ function squareY(r) {
   return C + SQ_HALF - (r + 0.5) * ((2 * SQ_HALF) / 8);
 }
 
-// 圆环 64 卦：从共享先天卦序取角度，换算 SVG 坐标（sin/cos 周期，行为与原实现一致）
+// 圆环 64 卦：从共享先天卦序取角度，换算 SVG 坐标；槽位按角度径向旋转，卦顶朝圆心（与罗盘六十四卦圈一致）
 const circleItems = fuXiRing.map((h) => ({
   name: h.name,
   binary: h.binary,
+  angle: h.angle,
   x: C + R_CIRCLE * Math.sin((h.angle * Math.PI) / 180),
   y: C - R_CIRCLE * Math.cos((h.angle * Math.PI) / 180),
 }));
