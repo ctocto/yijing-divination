@@ -42,15 +42,15 @@ import { ref, computed } from 'vue';
 在 `let buf = [];` 之后新增水平检测状态：
 
 ```js
-// 水平检测：平放时 beta≈90、gamma≈0；两轴都在容差内视为水平
+// 水平检测：平放（W3C 零状态）时 beta≈0、gamma≈0；两轴都在容差内视为水平
 export const LEVEL_TOLERANCE = 8;
-const beta = ref(null); // 前后倾（°）
-const gamma = ref(null); // 左右倾（°）
+const beta = ref(null); // 前后倾（°），平放=0
+const gamma = ref(null); // 左右倾（°），平放=0
 const level = computed(
   () =>
     beta.value !== null &&
     gamma.value !== null &&
-    Math.abs(beta.value - 90) <= LEVEL_TOLERANCE &&
+    Math.abs(beta.value) <= LEVEL_TOLERANCE &&
     Math.abs(gamma.value) <= LEVEL_TOLERANCE
 );
 ```
@@ -213,7 +213,7 @@ const bubbleDx = computed(() =>
   gamma.value === null ? 0 : clamp01(gamma.value / LEVEL_TOLERANCE) * BUBBLE_MAX
 );
 const bubbleDy = computed(() =>
-  beta.value === null ? 0 : clamp01((beta.value - 90) / LEVEL_TOLERANCE) * BUBBLE_MAX
+  beta.value === null ? 0 : clamp01(beta.value / LEVEL_TOLERANCE) * BUBBLE_MAX
 );
 ```
 

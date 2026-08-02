@@ -33,9 +33,9 @@
 
 ### 1. `src/composables/useCompassSensor.js`
 
-- `onOrientation(e)` 中新增 `beta`、`gamma` 两个 ref，从同一事件对象读取（平放时 beta≈90、gamma≈0）
+- `onOrientation(e)` 中新增 `beta`、`gamma` 两个 ref，从同一事件对象读取（W3C 零状态：平放时 beta≈0、gamma≈0）
 - 新增常量 `LEVEL_TOLERANCE = 8`（°）
-- 新增 computed `level = |beta − 90| ≤ 8 && |gamma| ≤ 8`
+- 新增 computed `level = |beta| ≤ 8 && |gamma| ≤ 8`（W3C 约定：平放 = beta 0）
 - `stopCompass()` 中一并清空 beta/gamma
 - `useCompassSensor()` 返回值新增 `beta`、`gamma`、`level`
 
@@ -48,7 +48,7 @@
   - 否则 → `rot = -angleOf(props.mountain)`（回落/吸附）
 - **守卫**：`onDown` 与 `select()` 开头加 `if (sensorState.value === 'running') return`（禁拖、禁点选山）
 - **盘心气泡**（固定层，天池位置 C,C）：
-  - 外圈 r≈28、内点 r≈4；气泡偏移 `dx = clamp(gamma / TOL, -1, 1) * 14`，`dy = clamp((beta - 90) / TOL, -1, 1) * 14`（符号按"气泡向低处滚"调）
+  - 外圈 r≈28、内点 r≈4；气泡偏移 `dx = clamp(gamma / TOL, -1, 1) * 14`，`dy = clamp(beta / TOL, -1, 1) * 14`（平放=0；符号按"气泡向低处滚"调）
   - 颜色：level 时内点朱砂色，否则墨淡色
   - 仅 `sensorState === 'running'` 时渲染
 
