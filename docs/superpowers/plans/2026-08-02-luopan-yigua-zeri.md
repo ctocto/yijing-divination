@@ -388,7 +388,7 @@ git commit -m "feat: 择日算法 —— 月建/日支/建除黄道序差/纳音
 - Modify: `src/components/fengshui/FengShuiView.vue`
 
 **Interfaces:**
-- Consumes: `drawLine`、`judgeChouYao`、`hexagramByBinary` from `@/utils/yijing`；`judgeZeri` from `@/utils/zeri`。
+- Consumes: `judgeChouYao` from `@/utils/yijing`；`judgeZeri` from `@/utils/zeri`；`hexagrams` from `@/data/hexagrams`（卦名→binary 反查）。
 - Reads: `readout`（已有）——易卦模式 `readout?.hexagram` 为卦名，择日模式 `readout?.term`/`readout?.jiazi`。
 
 - [ ] **Step 1: 易卦模式判断区替换占位**
@@ -451,15 +451,6 @@ git commit -m "feat: 择日算法 —— 月建/日支/建除黄道序差/纳音
 ```
 
 - [ ] **Step 3: script 区加 import 与计算属性**
-
-在 `<script setup lang="ts">` 的 import 区（`import { judgeAllSha, … } from '@/utils/sha';` 之后）加：
-
-```js
-import { judgeChouYao, hexagramByBinary } from '@/utils/yijing';
-import { judgeZeri } from '@/utils/zeri';
-```
-
-在 `outAngle` ref 与 `shuiInfo` computed 之后（`// —— 手机朝向对准` 注释之前）加：
 
 在 `<script setup lang="ts">` 的 import 区（`import { judgeAllSha, … } from '@/utils/sha';` 之后）加：
 
