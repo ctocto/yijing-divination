@@ -378,6 +378,55 @@ for (const m of MODES) {
 check(modeRings.ding.includes('earth'), '定向模式应含地盘正针');
 check(modeRings.gua.includes('hexagrams'), '易卦模式应含六十四卦');
 
+// —— 宿主五行（消砂）——
+check(
+  mansions.length === 28 && mansions.every((m) => m.sheng),
+  '二十八宿应全部有宿主五行'
+);
+const HOST = {
+  角: '木',
+  亢: '金',
+  氐: '土',
+  房: '火',
+  心: '火',
+  尾: '火',
+  箕: '水',
+  斗: '木',
+  牛: '金',
+  女: '土',
+  虚: '火',
+  危: '火',
+  室: '火',
+  壁: '水',
+  奎: '木',
+  娄: '金',
+  胃: '土',
+  昴: '火',
+  毕: '火',
+  觜: '火',
+  参: '水',
+  井: '木',
+  鬼: '金',
+  柳: '土',
+  星: '火',
+  张: '火',
+  翼: '火',
+  轸: '水',
+};
+check(
+  mansions.every((m) => m.sheng === HOST[m.name]),
+  '宿主五行应满足 木金土火火火水 循环（日/月→火）'
+);
+// 宿主五行 = 七曜 日/月→火，其余同 wuxing
+check(
+  mansions.every((m) =>
+    m.wuxing === '日' || m.wuxing === '月'
+      ? m.sheng === '火'
+      : m.sheng === m.wuxing
+  ),
+  '宿主五行应满足：七曜 日/月→火，其余同 wuxing'
+);
+
 if (failed) process.exit(1);
 console.log(
   '✓ 二十四山/三盘三针/节气/度数/二十八宿/六十甲子/卦环/读数/圈映射/飞星逻辑 校验通过'
