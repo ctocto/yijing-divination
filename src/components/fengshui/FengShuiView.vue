@@ -66,6 +66,7 @@
                   : `当前指向 ${liveName}（${Math.round(compassHeading)}°）`
               }}
             </span>
+            <span class="level-hint" :class="{ ok: isLevel }">{{ isLevel ? '已水平' : '请放平' }}</span>
             <button
               type="button"
               class="compass-btn"
@@ -179,6 +180,7 @@ const {
   supported: compassSupported,
   state: compassState,
   heading: compassHeading,
+  level: isLevel,
   startCompass,
   stopCompass,
 } = useCompassSensor();
@@ -338,6 +340,14 @@ onBeforeUnmount(stopCompass);
 }
 .compass-live {
   font-size: 13px;
+  color: var(--cinnabar);
+}
+.level-hint {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink-light);
+}
+.level-hint.ok {
   color: var(--cinnabar);
 }
 .compass-hint {
