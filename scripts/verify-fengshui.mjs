@@ -26,6 +26,14 @@ import {
   solarTerms,
   degreeTicks,
 } from '../src/data/luopan.js';
+import {
+  termAt,
+  jiaziAt,
+  hexagramAt,
+  mansionAt,
+  plateMountainAt,
+} from '../src/utils/luopanRead.js';
+import { RING_TYPES, MODES, modeRings } from '../src/data/luopanRings.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -320,6 +328,29 @@ check(
   jiazi.every((j) => j.nian && j.nian.length > 0),
   '每柱应有纳音'
 );
+
+// —— 读数工具 ——
+check(termAt(0) === '冬至', '0° 节气应为冬至');
+check(termAt(90) === '春分', '90° 节气应为春分');
+check(jiaziAt(0) === '甲子', '0° 甲子应为甲子');
+check(jiaziAt(12) === '丙寅', '12° 甲子应为丙寅');
+check(hexagramAt(0) === '乾', '0° 卦应为乾');
+check(hexagramAt(180) === '坤', '180° 卦应为坤');
+check(mansionAt(0) === '角', '0° 宿应为角');
+check(plateMountainAt(352.5, humanMountains) === '子', '人盘 352.5° 应为子');
+
+// —— 圈配置与模式映射 ——
+check(MODES.length === 5, `应 5 个模式，实为 ${MODES.length}`);
+check(new Set(MODES.map((m) => m.id)).size === 5, '模式 id 不应重复');
+for (const m of MODES) {
+  const rings = modeRings[m.id];
+  check(rings && rings.length > 0, `模式 ${m.id} 应有圈集`);
+  for (const r of rings) {
+    check(r in RING_TYPES, `模式 ${m.id} 引用了未定义圈 ${r}`);
+  }
+}
+check(modeRings.ding.includes('earth'), '定向模式应含地盘正针');
+check(modeRings.gua.includes('hexagrams'), '易卦模式应含六十四卦');
 
 if (failed) process.exit(1);
 console.log('✓ 二十四山结构 / 三元九运 / 断语表完整性 校验通过');
