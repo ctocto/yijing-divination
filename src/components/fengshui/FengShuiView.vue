@@ -14,40 +14,58 @@
 
     <div class="fs-body">
       <section class="fs-luopan">
-        <Luopan :mountain="selectedDir" @select="selectedDir = $event" />
+        <Luopan
+          :mountain="selectedDir"
+          :mode="luopanMode"
+          @select="selectedDir = $event"
+          @readout="readout = $event"
+        />
       </section>
 
       <section class="fs-controls">
-        <div class="mode-toggle" role="group" aria-label="坐向口径">
+        <div class="mode-switch" role="group" aria-label="罗盘模式">
           <button
+            v-for="m in MODES"
+            :key="m.id"
             type="button"
-            :class="{ active: mode === '坐山' }"
-            @click="mode = '坐山'"
+            :class="{ active: luopanMode === m.id }"
+            @click="luopanMode = m.id"
           >
-            坐山
-          </button>
-          <button
-            type="button"
-            :class="{ active: mode === '朝向' }"
-            @click="mode = '朝向'"
-          >
-            朝向
+            {{ m.label }}
           </button>
         </div>
+        <template v-if="luopanMode === 'ding'">
+          <div class="mode-toggle" role="group" aria-label="坐向口径">
+            <button
+              type="button"
+              :class="{ active: mode === '坐山' }"
+              @click="mode = '坐山'"
+            >
+              坐山
+            </button>
+            <button
+              type="button"
+              :class="{ active: mode === '朝向' }"
+              @click="mode = '朝向'"
+            >
+              朝向
+            </button>
+          </div>
 
-        <div class="period-row" role="group" aria-label="元运">
-          <button
-            v-for="p in 9"
-            :key="p"
-            type="button"
-            class="period-btn"
-            :class="{ active: period === p }"
-            @click="period = p"
-          >
-            {{ p }}
-          </button>
-        </div>
-        <p class="period-range">{{ periodInfo }}</p>
+          <div class="period-row" role="group" aria-label="元运">
+            <button
+              v-for="p in 9"
+              :key="p"
+              type="button"
+              class="period-btn"
+              :class="{ active: period === p }"
+              @click="period = p"
+            >
+              {{ p }}
+            </button>
+          </div>
+          <p class="period-range">{{ periodInfo }}</p>
+        </template>
 
         <div v-if="compassSupported" class="compass-row">
           <button
@@ -66,7 +84,9 @@
                   : `当前指向 ${liveName}（${Math.round(compassHeading)}°）`
               }}
             </span>
-            <span class="level-hint" :class="{ ok: isLevel }">{{ isLevel ? '已水平' : '请放平' }}</span>
+            <span class="level-hint" :class="{ ok: isLevel }">{{
+              isLevel ? '已水平' : '请放平'
+            }}</span>
             <button
               type="button"
               class="compass-btn"
@@ -84,46 +104,87 @@
           未获方向传感器权限，请在浏览器或系统设置中允许访问后重试
         </p>
 
-        <p class="readout">坐{{ shan }}朝{{ xiang }}</p>
-        <p class="overall-banner">
-          <b>{{ overallInfo.name }}</b> —— {{ overallInfo.text }}
+        <p class="readout">
+          <template v-if="luopanMode === 'ding'"
+            >坐{{ shan }}朝{{ xiang }}</template
+          >
+          <template v-else-if="luopanMode === 'xiao'"
+            >人盘 {{ readout?.human ?? '–' }} · 宿
+            {{ readout?.mansion ?? '–' }}</template
+          >
+          <template v-else-if="luopanMode === 'na'"
+            >天盘 {{ readout?.heaven ?? '–' }} ·
+            {{ readout?.degree ?? '–' }}°</template
+          >
+          <template v-else-if="luopanMode === 'ze'"
+            >{{ readout?.term ?? '–' }} · {{ readout?.jiazi ?? '–' }}</template
+          >
+          <template v-else-if="luopanMode === 'gua'"
+            >卦 {{ readout?.hexagram ?? '–' }}</template
+          >
+          <span v-if="luopanMode !== 'ding'" class="readout-deg">
+            {{ readout?.degree ?? '' }}°</span
+          >
+        </p>
+        <template v-if="luopanMode === 'ding'">
+          <p class="overall-banner">
+            <b>{{ overallInfo.name }}</b> —— {{ overallInfo.text }}
+          </p>
+        </template>
+        <p class="readout-detail">
+          <template v-if="luopanMode === 'ding'"
+            >{{ readout?.degree ?? '–' }}° ·
+            {{ readout?.term ?? '–' }}</template
+          >
+          <template v-else-if="luopanMode === 'gua'"
+            >先天圆环 · 坐向卦读数</template
+          >
         </p>
       </section>
 
-      <section class="fs-pan">
-        <FlyingStarPan :judges="judges" :special="special" />
-      </section>
+      <template v-if="luopanMode === 'ding'">
+        <section class="fs-pan">
+          <FlyingStarPan :judges="judges" :special="special" />
+        </section>
 
-      <section class="fs-reading">
-        <h2>宅运解读</h2>
-        <p class="advice">{{ overallInfo.advice }}</p>
+        <section class="fs-reading">
+          <h2>宅运解读</h2>
+          <p class="advice">{{ overallInfo.advice }}</p>
 
-        <h2>九宫分述</h2>
-        <ul class="palace-list">
-          <li v-for="j in judges" :key="j.palace" class="palace-line">
-            <span class="palace-tag">{{ j.palace }}</span>
-            <span class="lvl" :class="`lv-${j.level}`">{{ j.level }}</span>
-            <span class="brief">{{ j.brief }}</span>
-          </li>
-        </ul>
+          <h2>九宫分述</h2>
+          <ul class="palace-list">
+            <li v-for="j in judges" :key="j.palace" class="palace-line">
+              <span class="palace-tag">{{ j.palace }}</span>
+              <span class="lvl" :class="`lv-${j.level}`">{{ j.level }}</span>
+              <span class="brief">{{ j.brief }}</span>
+            </li>
+          </ul>
 
-        <h2>特殊方位</h2>
-        <ul class="special-list">
-          <li v-if="special.cai">
-            财位：<b>{{ special.cai }}</b> —— {{ spText.cai.text }}
-          </li>
-          <li v-if="special.wen">
-            文昌位：<b>{{ special.wen }}</b> —— {{ spText.wen.text }}
-          </li>
-          <li v-if="special.bing">
-            病符位：<b>{{ special.bing }}</b> —— {{ spText.bing.text }}
-          </li>
-          <li v-if="special.sha">
-            五黄煞：<b>{{ special.sha }}</b> —— {{ spText.sha.text }}
-          </li>
-        </ul>
+          <h2>特殊方位</h2>
+          <ul class="special-list">
+            <li v-if="special.cai">
+              财位：<b>{{ special.cai }}</b> —— {{ spText.cai.text }}
+            </li>
+            <li v-if="special.wen">
+              文昌位：<b>{{ special.wen }}</b> —— {{ spText.wen.text }}
+            </li>
+            <li v-if="special.bing">
+              病符位：<b>{{ special.bing }}</b> —— {{ spText.bing.text }}
+            </li>
+            <li v-if="special.sha">
+              五黄煞：<b>{{ special.sha }}</b> —— {{ spText.sha.text }}
+            </li>
+          </ul>
 
-        <p class="fs-disclaimer">玄空飞星 · 文化参考</p>
+          <p class="fs-disclaimer">玄空飞星 · 文化参考</p>
+        </section>
+      </template>
+
+      <section v-else class="fs-pending">
+        <h2>判断区</h2>
+        <p class="pending-text">
+          {{ pendingText }}
+        </p>
       </section>
     </div>
   </div>
@@ -132,6 +193,7 @@
 <script setup lang="ts">
 import { ref, computed, onBeforeUnmount } from 'vue';
 import Luopan from './Luopan.vue';
+import { MODES } from '@/data/luopanRings';
 import FlyingStarPan from './FlyingStarPan.vue';
 import { yunPeriods } from '@/data/luopan';
 import {
@@ -153,6 +215,8 @@ defineEmits(['close']);
 const mode = ref('坐山'); // '坐山' | '朝向'
 const selectedDir = ref('子'); // 红针所指 24 山（默认坐子朝午）
 const period = ref(9); // 默认九运（2024-2043）
+const luopanMode = ref('ding'); // 定向 | 消砂 | 纳水 | 择日 | 易卦
+const readout = ref(null); // Luopan 读数
 
 // 坐山/朝向：口径切换只改解释，山盘/向盘始终用坐山/朝向
 const shan = computed(() =>
@@ -173,6 +237,16 @@ const special = computed(() => specialPositions(pan.value, period.value));
 const periodInfo = computed(() => {
   const p = yunPeriods.find((x) => x.period === period.value);
   return p ? `${p.yuan}${period.value}运（${p.start}-${p.end}）` : '';
+});
+
+const pendingText = computed(() => {
+  const map = {
+    xiao: '消砂判断 · P3 上线（人盘中针 + 二十八宿 · 赖公砂法）',
+    na: '纳水判断 · P3 上线（天盘缝针 + 双山五行）',
+    ze: '择日输出 · P4 上线（二十四节气 + 六十甲子）',
+    gua: '抽爻换象 · P4 上线（先天六十四卦盘）',
+  };
+  return map[luopanMode.value] || '';
 });
 
 // 手机朝向对准：实时读数预览 + 手动锁定（锁定后写 selectedDir 走既有盘面链路）
@@ -276,6 +350,53 @@ onBeforeUnmount(stopCompass);
 .mode-toggle button.active {
   background: var(--cinnabar);
   color: #faf3e8;
+}
+.mode-switch {
+  display: inline-flex;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.mode-switch button {
+  padding: 7px 14px;
+  font-size: 14px;
+  color: var(--ink-light);
+  background: var(--scroll);
+  border: none;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+.mode-switch button.active {
+  background: var(--cinnabar);
+  color: #faf3e8;
+}
+.readout-deg {
+  font-size: 13px;
+  color: var(--ink-light);
+}
+.readout-detail {
+  font-size: 13px;
+  color: var(--gold);
+  margin: -4px 0 10px;
+}
+.fs-pending {
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+}
+.fs-pending h2 {
+  font-size: 16px;
+  color: var(--ink);
+  border-bottom: 1px dashed var(--gold);
+  padding-bottom: 6px;
+  letter-spacing: 0.12em;
+  margin: 20px 0 10px;
+}
+.pending-text {
+  font-size: 14px;
+  color: var(--ink-light);
 }
 .period-row {
   display: flex;
