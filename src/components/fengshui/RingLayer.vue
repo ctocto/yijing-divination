@@ -51,7 +51,7 @@
       <g
         v-for="(it, i) in items"
         :key="'G' + i"
-        :transform="`translate(${pos(it.angle, radius).x}, ${pos(it.angle, radius).y})`"
+        :transform="`translate(${pos(it.angle, radius).x}, ${pos(it.angle, radius).y})${it.glyph ? ` rotate(${it.angle})` : ''}`"
         text-anchor="middle"
         @pointerdown.stop="interactive && $emit('itemTap', it)"
       >
