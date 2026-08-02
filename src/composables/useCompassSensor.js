@@ -15,15 +15,15 @@ const heading = ref(null); // 平滑后的实时朝向 0-360（null = 尚无读�
 let listener = null;
 let buf = [];
 
-// 水平检测：平放时 beta≈90、gamma≈0；两轴都在容差内视为水平
+// 水平检测：平放（W3C 零状态）时 beta≈0、gamma≈0；两轴都在容差内视为水平
 export const LEVEL_TOLERANCE = 8;
-const beta = ref(null); // 前后倾（°）
-const gamma = ref(null); // 左右倾（°）
+const beta = ref(null); // 前后倾（°），平放=0
+const gamma = ref(null); // 左右倾（°），平放=0
 const level = computed(
   () =>
     beta.value !== null &&
     gamma.value !== null &&
-    Math.abs(beta.value - 90) <= LEVEL_TOLERANCE &&
+    Math.abs(beta.value) <= LEVEL_TOLERANCE &&
     Math.abs(gamma.value) <= LEVEL_TOLERANCE
 );
 
