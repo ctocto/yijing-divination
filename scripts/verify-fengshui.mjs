@@ -17,6 +17,7 @@ import {
   specialPositions,
   palaceJudges,
 } from '../src/utils/fengShui.js';
+import { fuXiRing } from '../src/utils/fuXiOrder.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -229,6 +230,19 @@ check(seenJudges.has('ping'), 'overallJudge 全扫应能产出平局（ping 可�
     );
   }
 }
+
+// —— 先天六十四卦圆环 ——
+check(fuXiRing.length === 64, `先天卦环应为 64 卦，实为 ${fuXiRing.length}`);
+check(new Set(fuXiRing.map((x) => x.name)).size === 64, '先天卦环卦名不应重复');
+const g0 = fuXiRing.find((x) => x.angle === 0);
+check(g0 && g0.name === '乾', '先天卦环 0° 应为乾');
+const g180 = fuXiRing.find((x) => x.angle === 180);
+check(g180 && g180.name === '坤', '先天卦环 180° 应为坤');
+const ringAngles = fuXiRing.map((x) => x.angle).sort((a, b) => a - b);
+check(
+  ringAngles.every((a, i) => a === i * (360 / 64)),
+  '先天卦环角度应每 5.625° 连续'
+);
 
 if (failed) process.exit(1);
 console.log('✓ 二十四山结构 / 三元九运 / 断语表完整性 校验通过');
