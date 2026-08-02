@@ -14,6 +14,7 @@ export function judgeSha(
 export interface ShaDirection {
   deg: number;
   name: string;
+  mountains: string[];
 }
 export const SHA_DIRECTIONS: ShaDirection[];
 export interface ShaRow {
@@ -25,9 +26,11 @@ export interface ShaRow {
   name: string; // 砂名（生砂/旺砂/…）
   level: '吉' | '凶';
   text: string;
+  fang: { name: string; fang: number[] }[];
 }
 export function judgeAllSha(shanDeg: number): ShaRow[];
 export function baShaAt(
   shanDeg: number
 ): { branch: string; angle: number } | null;
+export function fenFangByMountain(name: string): number[];
 export function fenFang(deg: number): number[];

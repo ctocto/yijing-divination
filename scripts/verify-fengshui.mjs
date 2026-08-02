@@ -50,6 +50,7 @@ import {
   judgeAllSha,
   baShaAt,
   fenFang,
+  fenFangByMountain,
   mansionAtDetail,
 } from '../src/utils/sha.js';
 
@@ -526,6 +527,19 @@ check(
 );
 check(baShaAt(0) && baShaAt(0).branch === '辰', '坐坎八煞应为辰');
 check(fenFang(0).length === 3, '子方应属天元龙（应 3 房）');
+check(fenFangByMountain('子').join('/') === '1/4/7', '天元山应房应为 1/4/7');
+check(fenFangByMountain('壬').join('/') === '2/5/8', '地元山应房应为 2/5/8');
+check(fenFangByMountain('癸').join('/') === '3/6/9', '人元山应房应为 3/6/9');
+const shaRow0 = judgeAllSha(0)[0];
+check(shaRow0.fang.length === 3, '每卦宫应房应含 3 山');
+check(
+  shaRow0.fang.every((f) => Array.isArray(f.fang) && f.fang.length === 3),
+  '每山应房应为 3 个数'
+);
+check(
+  new Set(shaRow0.fang.map((f) => f.fang.join('/'))).size === 3,
+  '卦宫 3 山应房应有区分度（地/天/人元各一）'
+);
 
 if (failed) process.exit(1);
 console.log(

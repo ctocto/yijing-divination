@@ -209,7 +209,11 @@
                 <td>{{ s.mansion }}·{{ s.shaWx }}</td>
                 <td>{{ s.name }}</td>
                 <td class="lvl" :class="`lv-${s.level}`">{{ s.level }}</td>
-                <td>{{ s.fang.join('/') }}</td>
+                <td class="sha-fang">
+                  <span v-for="f in s.fang" :key="f.name"
+                    >{{ f.name }}·{{ f.fang.join('/') }}</span
+                  >
+                </td>
               </tr>
             </tbody>
           </table>
@@ -241,7 +245,6 @@ import {
   lineWuxingAt,
   mansionShengAt,
   baShaAt,
-  fenFang,
 } from '@/utils/sha';
 import {
   overallJudgments,
@@ -305,9 +308,7 @@ const shanAngle = computed(() => {
 const shanSheng = computed(() => mansionShengAt(shanAngle.value));
 const shanLine = computed(() => lineWuxingAt(shanAngle.value));
 // 八方砂：坐山线度五行为主，八方砂宿主五行为宾
-const shaRows = computed(() =>
-  judgeAllSha(shanAngle.value).map((s) => ({ ...s, fang: fenFang(s.deg) }))
-);
+const shaRows = computed(() => judgeAllSha(shanAngle.value));
 // 坐山八煞
 const baShaInfo = computed(() => baShaAt(shanAngle.value));
 // 当前十字线所指方位（吸附 45°）
@@ -495,6 +496,13 @@ onBeforeUnmount(stopCompass);
 }
 .sha-table tr.current {
   background: rgba(178, 58, 46, 0.08);
+}
+.sha-fang span {
+  display: block;
+  white-space: nowrap;
+}
+.sha-fang span + span {
+  margin-top: 2px;
 }
 .sha-detail {
   font-size: 13px;
