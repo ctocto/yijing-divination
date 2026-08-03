@@ -72,6 +72,8 @@ import {
   lineName,
   hexagramByBinary,
   judgeChouYao,
+  yaoAt,
+  judgeGuaQi,
 } from '../src/utils/yijing.js';
 import {
   dayBranch,
@@ -85,7 +87,13 @@ import {
   FENJIN_ZHI,
   GAN_SEQ,
 } from '../src/data/fenjin.js';
-import { fenjinAt, judgeFenjin } from '../src/utils/fenjin.js';
+import {
+  fenjinAt,
+  judgeFenjin,
+  yearGanZhi,
+  nianWuxing,
+  judgeXianMing,
+} from '../src/utils/fenjin.js';
 
 let failed = false;
 const check = (cond, msg) => {
@@ -700,6 +708,44 @@ check(chou.line.startsWith('九二'), '乾二爻爻辞应以九二起');
 check(chou.bianPlain.length > 0, '变卦应有白话解读');
 check(judgeChouYao('00000', 3) === null, '非法 binary 应返回 null 而非抛错');
 
+// —— 玄空大卦抽爻（线压爻动，卦内 6 爻均分 0.9375°）——
+check(
+  yaoAt(0).name === '乾' && yaoAt(0).index === 3,
+  '0° 应压乾卦四爻（卦中）'
+);
+check(
+  yaoAt(358).name === '乾' && yaoAt(358).index === 0,
+  '358° 应压乾卦初爻（卦位起角）'
+);
+check(yaoAt(1.5).name === '乾' && yaoAt(1.5).index === 4, '1.5° 应压乾卦五爻');
+check(
+  yaoAt(180).name === '坤' && yaoAt(180).index === 3,
+  '180° 应压坤卦四爻（卦中）'
+);
+
+// —— 卦气（玄空大卦抽爻断法，文献实例）——
+const gqLi = judgeGuaQi('110111'); // 履 上乾9 下兑4
+check(
+  gqLi.rel === '生成数' && gqLi.ji === '吉',
+  '履（乾上兑下）应四九为朋生成数吉'
+);
+const gqYi = judgeGuaQi('100011'); // 益 上巽2 下震8
+check(gqYi.rel === '合十' && gqYi.ji === '吉', '益（巽上震下）应二八合十吉');
+const gqPi = judgeGuaQi('000111'); // 否 上乾9 下坤1
+check(gqPi.rel === '合十' && gqPi.ji === '吉', '否（乾上坤下）应九一合十吉');
+const gqDaYou = judgeGuaQi('111101'); // 大有 上离3 下乾9
+check(
+  gqDaYou.rel === '' && gqDaYou.ji === '凶',
+  '大有（离上乾下）应不合数理且火克金凶'
+);
+// 方向回归：乾金克巽木为「金克木」（下克上），不得写成 木克金
+const gqXiaoXu = judgeGuaQi('111011'); // 小畜 上巽2 下乾9
+check(
+  gqXiaoXu.ji === '凶' && gqXiaoXu.text.includes('金克木'),
+  '小畜（巽上乾下）应不合数理且金克木凶'
+);
+check(judgeGuaQi('00') === null, '非法 binary 卦气应返回 null');
+
 // —— 择日算法 ——
 check(dayBranch('甲子') === '子', '甲子日支应子');
 check(dayBranch('癸亥') === '亥', '癸亥日支应亥');
@@ -837,6 +883,40 @@ for (const a of [0, 3, 45, 100, 200, 357]) {
   const r = judgeFenjin(a);
   check(r.shan.level === r.xiang.level, `${a}° 坐向分金吉凶应对称`);
 }
+
+// —— 仙命配分金（仙命为主、分金为从，文献实例）——
+check(yearGanZhi(1984).name === '甲子', '1984 应为甲子年');
+check(yearGanZhi(1948).name === '戊子', '1948 应为戊子年');
+check(yearGanZhi(2024).name === '甲辰', '2024 应为甲辰年');
+check(yearGanZhi(1948).nian === '霹雳火', '戊子年纳音应霹雳火');
+check(
+  nianWuxing('海中金') === '金' && nianWuxing('涧下水') === '水',
+  '纳音取末字应得五行（金/水）'
+);
+check(
+  nianWuxing('霹雳火') === '火' &&
+    nianWuxing('松柏木') === '木' &&
+    nianWuxing('壁上土') === '土',
+  '纳音五行应取末字（火/木/土）'
+);
+// 仙命乙丑（海中金，1925）：丙寅(炉中火) → 分金克仙命 杀凶；庚寅(松柏木) → 仙命克分金 财吉
+const xm1 = judgeXianMing(1925, '炉中火');
+check(
+  xm1.relation === '杀' && xm1.ji === '凶',
+  '乙丑仙命+丙寅(炉中火) 应杀凶（火克金）'
+);
+const xm2 = judgeXianMing(1925, '松柏木');
+check(
+  xm2.relation === '财' && xm2.ji === '吉',
+  '乙丑仙命+庚寅(松柏木) 应财吉（金克木）'
+);
+// 仙命戊子（霹雳火，1948）+ 丙子(涧下水) → 分金克仙命 杀凶
+const xm3 = judgeXianMing(1948, '涧下水');
+check(
+  xm3.relation === '杀' && xm3.ji === '凶',
+  '戊子仙命+丙子(涧下水) 应杀凶（水克火）'
+);
+check(judgeXianMing(1948, '') === null, '空纳音应返回 null');
 
 if (failed) process.exit(1);
 console.log(

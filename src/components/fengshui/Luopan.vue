@@ -340,7 +340,8 @@ function onMove(e) {
 function onUp() {
   if (!dragging.value) return;
   dragging.value = false;
-  const step = props.mode === 'ding' ? 3 : 15;
+  // 定向/易卦模式吸附 3°（分金/抽爻精度），其余模式 15°
+  const step = props.mode === 'ding' || props.mode === 'gua' ? 3 : 15;
   const snapped = Math.round(rot.value / step) * step;
   rot.value = snapped;
   // 吸附后立即同步发射读数，令父级 fineAngle 收敛至吸附值；

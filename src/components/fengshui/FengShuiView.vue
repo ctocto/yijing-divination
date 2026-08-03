@@ -156,6 +156,29 @@
         <section class="fs-fenjin">
           <h2>分金吉凶</h2>
           <p class="fj-hint">点按居中即正向·龟甲，拖拽微调至旺相分金</p>
+          <div class="fj-xianming">
+            <label for="xianming-year">仙命（出生年）：</label>
+            <input
+              id="xianming-year"
+              v-model.number="xianMingYear"
+              type="number"
+              inputmode="numeric"
+              placeholder="如 1948"
+              min="1"
+              max="9999"
+            />
+            <button
+              v-if="xianMingYear"
+              type="button"
+              class="fj-xm-clear"
+              @click="xianMingYear = null"
+            >
+              清空
+            </button>
+          </div>
+          <p v-if="xianMingInfo" class="fj-xm-head">
+            仙命 <b>{{ xianMingInfo.name }}</b> · {{ xianMingInfo.nian }}
+          </p>
           <template v-if="fenjin">
             <p class="fj-row">
               坐分金：<b>{{ fenjin.shan.name }}</b
@@ -168,6 +191,13 @@
               · {{ fenjin.shan.ji }}
             </p>
             <p class="fj-text">{{ fenjin.shan.text }}</p>
+            <p
+              v-if="shanXm"
+              class="fj-text fj-xm"
+              :class="shanXm.ji === '吉' ? 'fj-xm-good' : 'fj-xm-bad'"
+            >
+              仙命配分金：{{ shanXm.text }}
+            </p>
             <p class="fj-row">
               向分金：<b>{{ fenjin.xiang.name }}</b
               >（{{ fenjin.xiang.nian || '—' }}）·
@@ -179,6 +209,13 @@
               · {{ fenjin.xiang.ji }}
             </p>
             <p class="fj-text">{{ fenjin.xiang.text }}</p>
+            <p
+              v-if="xiangXm"
+              class="fj-text fj-xm"
+              :class="xiangXm.ji === '吉' ? 'fj-xm-good' : 'fj-xm-bad'"
+            >
+              仙命配分金：{{ xiangXm.text }}
+            </p>
           </template>
           <p class="fs-disclaimer">一百二十分金 · 文化参考</p>
         </section>
@@ -315,7 +352,7 @@
 
       <template v-else-if="luopanMode === 'gua'">
         <section class="fs-yijing">
-          <h2>抽爻换象</h2>
+          <h2>抽爻换象 · 玄空大卦</h2>
           <p class="yi-ben">
             本卦 <b>{{ benGuaName }}</b>
           </p>
@@ -327,12 +364,28 @@
               class="yi-line"
               :class="{ active: movingYao === i - 1 }"
               :aria-pressed="movingYao === i - 1"
-              @click="movingYao = i - 1"
+              @click="pickYao(i - 1)"
             >
               {{ yaoLines[i - 1] }}
             </button>
           </div>
-          <p class="yi-hint">点选一爻为动爻</p>
+          <div class="yi-auto-row">
+            <label class="yi-auto">
+              <input
+                type="checkbox"
+                :checked="autoYao"
+                @change="toggleAutoYao"
+              />
+              自动抽爻
+            </label>
+            <span v-if="autoYaoName" class="yi-auto-hint"
+              >线压 {{ autoYaoName }}爻</span
+            >
+          </div>
+          <p class="yi-hint">
+            {{ autoYao ? '转盘即线压爻动；点爻可转手动' : '手动选一爻为动爻' }}
+          </p>
+          <p class="yi-fenjin">配分金：{{ guaFenjinText }}</p>
           <template v-if="chouYao">
             <p class="yi-line-text">
               动爻 <b>{{ chouYao.line }}</b>
@@ -342,9 +395,16 @@
                 chouYao.bianPlain
               }}）
             </p>
+            <p
+              v-if="guaQi"
+              class="yi-guaqi"
+              :class="guaQi.ji === '吉' ? 'ok' : guaQi.ji === '凶' ? 'bad' : ''"
+            >
+              卦气：{{ guaQi.text }}
+            </p>
           </template>
           <p v-else class="yi-none">选一爻看变卦</p>
-          <p class="fs-disclaimer">六十四卦抽爻 · 文化参考</p>
+          <p class="fs-disclaimer">玄空大卦抽爻 · 文化参考</p>
         </section>
       </template>
 
@@ -391,9 +451,20 @@ import {
   baShaAt,
 } from '@/utils/sha';
 import { hexagrams } from '@/data/hexagrams';
-import { judgeChouYao } from '@/utils/yijing';
+import {
+  judgeChouYao,
+  drawLine,
+  lineName,
+  yaoAt,
+  judgeGuaQi,
+} from '@/utils/yijing';
 import { judgeZeri } from '@/utils/zeri';
-import { judgeFenjin } from '@/utils/fenjin';
+import {
+  judgeFenjin,
+  fenjinAt,
+  yearGanZhi,
+  judgeXianMing,
+} from '@/utils/fenjin';
 import {
   overallJudgments,
   specialPositions as spText,
@@ -430,6 +501,10 @@ watch(
   () => luopanMode.value,
   (m) => {
     if (m !== 'ding') fineAngle.value = null;
+    // 进入易卦模式且为自动抽爻：立即按当前角度定动爻
+    if (m === 'gua' && autoYao.value && readout.value?.angle !== undefined) {
+      movingYao.value = yaoAt(readout.value.angle).index;
+    }
   }
 );
 // 分金判断：坐 = 坐山物理角度，向 = 坐 +180°
@@ -439,6 +514,22 @@ const fenjin = computed(() => {
   const shanAngle = readout.value.angle + (mode.value === '坐山' ? 0 : 180);
   return judgeFenjin(shanAngle);
 });
+
+// 仙命配分金：仙命出生年 → 年干支纳音 → 与坐/向分金纳音生克
+const xianMingYear = ref(null); // 仙命出生年（阴宅）
+const xianMingInfo = computed(() =>
+  xianMingYear.value ? yearGanZhi(xianMingYear.value) : null
+);
+const shanXm = computed(() =>
+  xianMingYear.value && fenjin.value?.shan?.nian
+    ? judgeXianMing(xianMingYear.value, fenjin.value.shan.nian)
+    : null
+);
+const xiangXm = computed(() =>
+  xianMingYear.value && fenjin.value?.xiang?.nian
+    ? judgeXianMing(xianMingYear.value, fenjin.value.xiang.nian)
+    : null
+);
 
 // 坐山/朝向：口径切换只改解释，山盘/向盘始终用坐山/朝向
 const shan = computed(() =>
@@ -504,6 +595,7 @@ const shuiInfo = computed(() =>
 
 // —— 易卦抽爻 ——
 const movingYao = ref(null); // 动爻位 0=初爻 … 5=上爻
+const autoYao = ref(true); // 自动抽爻（十字线线压爻动）；关 → 手动选爻
 const benGuaName = computed(() => readout.value?.hexagram ?? '–');
 // 卦名 → 本卦 binary（卦名唯一）
 const benBinary = computed(
@@ -519,6 +611,28 @@ const chouYao = computed(() =>
     ? judgeChouYao(benBinary.value, movingYao.value)
     : null
 );
+// 卦气：变卦内外卦先天洛书数 合五/合十/合十五/生成数 → 吉（玄空大卦抽爻断法）
+const guaQi = computed(() =>
+  movingYao.value !== null && benBinary.value
+    ? judgeGuaQi(drawLine(benBinary.value, movingYao.value))
+    : null
+);
+// 自动抽爻当前线压爻名（如 初九）
+const autoYaoName = computed(() =>
+  autoYao.value && movingYao.value !== null && benBinary.value
+    ? lineName(benBinary.value, movingYao.value)
+    : ''
+);
+// 配分金：十字线当前角度 120 分金（抽爻换象配分金定卦气）
+const guaFenjin = computed(() =>
+  readout.value?.angle !== undefined ? fenjinAt(readout.value.angle) : null
+);
+const guaFenjinText = computed(() => {
+  const f = guaFenjin.value;
+  if (!f) return '–';
+  if (f.type === 'kongwang') return '骑缝空亡';
+  return `${f.name}·${f.level}（${f.nian || '—'}）`;
+});
 
 // —— 择日 ——
 const zeriInfo = computed(() =>
@@ -527,11 +641,20 @@ const zeriInfo = computed(() =>
     : null
 );
 
-// 换坐向卦时清空动爻
+// 自动抽爻：十字线角度 → 所压卦爻（线压爻动）；易卦模式实时联动变卦
+watch(
+  () => readout.value?.angle,
+  (a) => {
+    if (luopanMode.value === 'gua' && autoYao.value && a !== undefined) {
+      movingYao.value = yaoAt(a).index;
+    }
+  }
+);
+// 手动抽爻时换坐向卦清空（自动模式由角度 watch 接管）
 watch(
   () => readout.value?.hexagram,
   () => {
-    movingYao.value = null;
+    if (!autoYao.value) movingYao.value = null;
   }
 );
 
@@ -554,6 +677,20 @@ const liveName = computed(() =>
 function onSettleMountain(name) {
   selectedDir.value = name;
   fineAngle.value = null;
+}
+
+// 点爻 → 手动抽爻（补助元运之不足，可主动选动爻）
+function pickYao(i) {
+  movingYao.value = i;
+  autoYao.value = false;
+}
+
+// 自动抽爻开关：开 → 按当前角度线压爻动
+function toggleAutoYao() {
+  autoYao.value = !autoYao.value;
+  if (autoYao.value && readout.value?.angle !== undefined) {
+    movingYao.value = yaoAt(readout.value.angle).index;
+  }
 }
 
 function lockCompass() {
@@ -1086,6 +1223,89 @@ onBeforeUnmount(stopCompass);
   color: var(--gold);
 }
 .fj-bad {
+  color: var(--ink-light);
+}
+.fj-xianming {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--ink);
+}
+.fj-xianming input {
+  width: 110px;
+  padding: 6px 8px;
+  font-size: 14px;
+  color: var(--deep-ink);
+  background: var(--scroll);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+}
+.fj-xm-clear {
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--ink-light);
+  background: none;
+  border: 1px dashed var(--gold-light);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.fj-xm-head {
+  font-size: 13px;
+  color: var(--cinnabar);
+  margin-top: 6px;
+}
+.fj-xm {
+  color: var(--deep-ink);
+}
+.fj-xm-good {
+  color: var(--gold);
+}
+.fj-xm-bad {
+  color: var(--cinnabar);
+}
+.yi-auto-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+.yi-auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.yi-auto-hint {
+  font-size: 12px;
+  color: var(--cinnabar);
+}
+.yi-fenjin {
+  font-size: 13px;
+  color: var(--gold);
+  margin-top: 6px;
+}
+.yi-guaqi {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+  border: 1px solid var(--gold-light);
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: var(--scroll);
+  margin-top: 8px;
+}
+.yi-guaqi.ok {
+  color: var(--cinnabar);
+}
+.yi-guaqi.bad {
   color: var(--ink-light);
 }
 .fs-disclaimer {

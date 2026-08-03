@@ -18,3 +18,21 @@ export interface FenjinResult {
   xiang: FenjinSide;
 }
 export function judgeFenjin(deg: number): FenjinResult;
+export interface GanZhiResult {
+  name: string;
+  nian: string;
+}
+export function yearGanZhi(year: number): GanZhiResult;
+export function nianWuxing(nian: string): string;
+export interface XianMingResult {
+  xm: string;
+  xmNian: string;
+  relation: '生' | '旺' | '财' | '泄' | '杀';
+  ji: '吉' | '凶';
+  label: string;
+  text: string;
+}
+export function judgeXianMing(
+  year: number,
+  fenjinNian: string
+): XianMingResult | null;
