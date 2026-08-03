@@ -31,6 +31,10 @@ export const GUIDE = [
     title: '六爻起卦',
     blocks: [
       {
+        type: 'para',
+        text: '六爻起卦是干什么的：心里有事拿不定主意时，问一卦，看事情的大致走向和给自己的提示。什么时候用：面对选择、想换个角度看问题时。',
+      },
+      {
         type: 'steps',
         title: '怎么用',
         steps: [
@@ -71,6 +75,10 @@ export const GUIDE = [
     id: 'overview',
     title: '罗盘总览',
     blocks: [
+      {
+        type: 'para',
+        text: '罗盘总览是干什么的：先认识整个风水罗盘——盘面、红色十字线、五种模式各自干什么，再进入具体功能。什么时候用：第一次用罗盘，或忘了某个模式是干嘛时。',
+      },
       {
         type: 'steps',
         title: '怎么用',
@@ -133,6 +141,10 @@ export const GUIDE = [
     id: 'ding',
     title: '定向 · 立向分金',
     blocks: [
+      {
+        type: 'para',
+        text: '定向是干什么的：量房子（或坟地）的坐山和朝向，定了朝向才能看立向分金吉凶和宅运飞星。什么时候用：买房看朝向、装修前定坐向、给坟地定向时。',
+      },
       {
         type: 'steps',
         title: '怎么用',
@@ -261,6 +273,10 @@ export const GUIDE = [
     title: '宅运 · 九宫飞星',
     blocks: [
       {
+        type: 'para',
+        text: '宅运是干什么的：看一栋房子整体的吉凶格局——哪些方位旺、哪些方位凶，财位、文昌位在哪。什么时候用：坐向定下来后看整宅运势。',
+      },
+      {
         type: 'steps',
         title: '怎么用',
         steps: [
@@ -311,6 +327,10 @@ export const GUIDE = [
     title: '消砂',
     blocks: [
       {
+        type: 'para',
+        text: '消砂是干什么的：看房子周围的山峰、高楼等「挡在前面的东西」挡得吉不吉。什么时候用：宅前宅后有山或高楼时。',
+      },
+      {
         type: 'steps',
         title: '怎么用',
         steps: [
@@ -351,6 +371,10 @@ export const GUIDE = [
     id: 'na',
     title: '纳水',
     blocks: [
+      {
+        type: 'para',
+        text: '纳水是干什么的：看宅前水流来去的方位吉凶。什么时候用：宅前有江河湖海或明显水势时。',
+      },
       {
         type: 'steps',
         title: '怎么用',
@@ -394,6 +418,10 @@ export const GUIDE = [
     id: 'ze',
     title: '择日',
     blocks: [
+      {
+        type: 'para',
+        text: '择日是干什么的：挑一个好日子办事。什么时候用：搬家、开业、动土、婚嫁前选日子。',
+      },
       {
         type: 'steps',
         title: '怎么用',
@@ -473,6 +501,10 @@ export const GUIDE = [
     id: 'gua',
     title: '易卦抽爻',
     blocks: [
+      {
+        type: 'para',
+        text: '易卦抽爻是干什么的：在六十四卦盘上翻动一爻，看事情如何演变、结果如何。什么时候用：想深一层看事情的来龙去脉时。',
+      },
       {
         type: 'steps',
         title: '怎么用',
