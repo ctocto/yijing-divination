@@ -617,7 +617,7 @@ onBeforeUnmount(stopCompass);
   padding: 16px 20px 48px;
 }
 .fs-luopan {
-  width: min(70vw, 380px);
+  width: min(100%, 540px);
   margin: 0 auto 10px;
 }
 .fs-controls {
@@ -1099,12 +1099,13 @@ onBeforeUnmount(stopCompass);
 @media (min-width: 820px) {
   .fs-body {
     display: grid;
-    grid-template-columns: 380px 1fr;
+    grid-template-columns: minmax(380px, 540px) 1fr;
     gap: 20px;
     align-items: start;
   }
   .fs-luopan {
     grid-row: 1 / 3;
+    width: 100%;
     margin: 0;
   }
   .fs-pan {
