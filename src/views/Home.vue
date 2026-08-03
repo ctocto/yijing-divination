@@ -56,6 +56,7 @@
           <button class="cast-btn" type="button" :disabled="state !== 'idle'" @click="drawHexagram">静 心 起 卦</button>
           <button class="library-link" type="button" @click="showLibrary = true">浏览六十四卦 ▸</button>
           <button class="library-link" type="button" @click="showFengShui = true">风水罗盘 ▸</button>
+          <button class="library-link" type="button" @click="openHelp()">操作手册 ▸</button>
           <p class="colophon">邵雍《皇极经世》· 六十四卦方位</p>
         </footer>
       </div>
@@ -66,7 +67,16 @@
     <HexagramDetailPanel v-if="selectedHexagram" />
     <HexagramLibrary v-if="showLibrary" @close="showLibrary = false" />
     <ResultScroll v-if="state === 'reading'" />
-    <FengShuiView v-if="showFengShui" @close="showFengShui = false" />
+    <FengShuiView
+      v-if="showFengShui"
+      @close="showFengShui = false"
+      @help="openHelp"
+    />
+    <HelpPanel
+      v-if="showHelp"
+      :initial-section="helpSection"
+      @close="showHelp = false"
+    />
   </div>
 </template>
 
@@ -77,6 +87,7 @@ import HexagramDetailPanel from '../components/compass/HexagramDetailPanel.vue'
 import HexagramLibrary from '../components/compass/HexagramLibrary.vue'
 import ResultScroll from '../components/scroll/ResultScroll.vue'
 import FengShuiView from '../components/fengshui/FengShuiView.vue'
+import HelpPanel from '../components/help/HelpPanel.vue'
 import { useCompass } from '../composables/useCompass'
 import { hexagrams } from '../data/hexagrams'
 
@@ -94,6 +105,8 @@ const {
 const hoverName = ref('')
 const showLibrary = ref(false)
 const showFengShui = ref(false)
+const showHelp = ref(false)
+const helpSection = ref('')
 
 // 注释条显示：优先悬停卦，其次选中卦
 const info = computed(() => {
@@ -106,6 +119,12 @@ function onSelect(name) {
   if (!h) return
   if (selectedHexagram.value?.name === name) clearSelection()
   else selectHexagram(h)
+}
+
+// 打开操作手册：主页面无定位章节；风水罗盘内点「？」带当前模式章节 id
+function openHelp(section = '') {
+  helpSection.value = section
+  showHelp.value = true
 }
 </script>
 

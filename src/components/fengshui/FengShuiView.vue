@@ -2,14 +2,24 @@
   <div class="fs-view" role="dialog" aria-label="风水 · 罗盘宅运">
     <header class="fs-header">
       <h1 class="fs-title">风水 · 罗盘宅运</h1>
-      <button
-        class="fs-close"
-        type="button"
-        aria-label="关闭"
-        @click="$emit('close')"
-      >
-        ×
-      </button>
+      <div class="fs-actions">
+        <button
+          class="fs-close"
+          type="button"
+          aria-label="操作手册"
+          @click="$emit('help', helpSectionId)"
+        >
+          ？
+        </button>
+        <button
+          class="fs-close"
+          type="button"
+          aria-label="关闭"
+          @click="$emit('close')"
+        >
+          ×
+        </button>
+      </div>
     </header>
 
     <div class="fs-body">
@@ -604,13 +614,18 @@ import {
 } from '@/utils/fengShui';
 import { useCompassSensor } from '@/composables/useCompassSensor';
 
-defineEmits(['close']);
+defineEmits(['close', 'help']);
 
 const mode = ref('坐山'); // '坐山' | '朝向'
 const selectedDir = ref('子'); // 红针所指 24 山（默认坐子朝午）
 const period = ref(9); // 默认九运（2024-2043）
 const luopanMode = ref('ding'); // 定向 | 消砂 | 纳水 | 择日 | 易卦
 const readout = ref(null); // Luopan 读数
+// 操作手册「？」定位章节：按当前模式跳转（ding 含分金/穿山/透地/飞星，统一落 ding 章）
+const HELP_SECTION = { ding: 'ding', xiao: 'xiao', na: 'na', ze: 'ze', gua: 'gua' };
+const helpSectionId = computed(
+  () => HELP_SECTION[luopanMode.value] || 'overview'
+);
 // 定向圈位：分金 / 穿山 / 透地 共用一圈位，一次只显示一个（默认分金）
 const ringSlot = ref('fenjin');
 const RING_SLOTS = [
@@ -923,6 +938,11 @@ onBeforeUnmount(stopCompass);
   padding: 14px 20px;
   border-bottom: 1px solid var(--gold);
   background: var(--scroll);
+}
+.fs-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .fs-title {
   font-family: 'Ma Shan Zheng', 'STKaiti', cursive;
