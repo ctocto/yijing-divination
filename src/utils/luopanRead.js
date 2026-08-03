@@ -2,6 +2,7 @@
 import { solarTerms } from '../data/luopan.js';
 import { mansions } from '../data/mansions.js';
 import { jiazi } from '../data/jiazi.js';
+import { chuanShan72, touDi60 } from '../data/long.js';
 import { fuXiRing } from './fuXiOrder.js';
 
 function normalize(a) {
@@ -26,6 +27,9 @@ export function itemAt(deg, items, angleKey = 'angle') {
 
 export const termAt = (deg) => itemAt(deg, solarTerms).name;
 export const jiaziAt = (deg) => itemAt(deg, jiazi).name;
+// 穿山/透地龙神：返回整槽（含吉凶/纳音/五气），十字线落在哪格取哪格
+export const chuanShanAt = (deg) => itemAt(deg, chuanShan72);
+export const touDiAt = (deg) => itemAt(deg, touDi60);
 export const plateMountainAt = (deg, plate) => itemAt(deg, plate).name;
 export const hexagramAt = (deg) => itemAt(deg, fuXiRing).name;
 

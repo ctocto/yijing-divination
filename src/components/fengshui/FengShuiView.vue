@@ -17,6 +17,7 @@
         <Luopan
           :mountain="selectedDir"
           :mode="luopanMode"
+          :ring-slot="ringSlot"
           :fine-angle="luopanMode === 'ding' ? fineAngle : null"
           @select="selectedDir = $event"
           @settle="onSettleMountain"
@@ -51,6 +52,17 @@
               @click="mode = '朝向'"
             >
               朝向
+            </button>
+          </div>
+          <div class="mode-toggle" role="group" aria-label="定向圈位">
+            <button
+              v-for="s in RING_SLOTS"
+              :key="s.id"
+              type="button"
+              :class="{ active: ringSlot === s.id }"
+              @click="ringSlot = s.id"
+            >
+              {{ s.label }}
             </button>
           </div>
 
@@ -107,12 +119,17 @@
         </p>
 
         <p class="readout">
-          <template v-if="luopanMode === 'ding'"
+          <template v-if="luopanMode === 'ding' && ringSlot === 'fenjin'"
             >坐{{ shan }}·{{ fenjin?.shan.name ?? '骑缝' }}({{
               fenjin?.shan.level ?? '–'
             }}) 朝{{ xiang }}·{{ fenjin?.xiang.name ?? '骑缝' }}({{
               fenjin?.xiang.level ?? '–'
             }})</template
+          >
+          <template v-else-if="luopanMode === 'ding'"
+            >坐{{ shan }}·{{ slotShanName }}({{ slotShanLevel }}) 朝{{
+              xiang
+            }}·{{ slotXiangName }}({{ slotXiangLevel }})</template
           >
           <template v-else-if="luopanMode === 'xiao'"
             >人盘 {{ readout?.human ?? '–' }} · 宿
@@ -154,70 +171,135 @@
         </section>
 
         <section class="fs-fenjin">
-          <h2>分金吉凶</h2>
-          <p class="fj-hint">点按居中即正向·龟甲，拖拽微调至旺相分金</p>
-          <div class="fj-xianming">
-            <label for="xianming-year">仙命（出生年）：</label>
-            <input
-              id="xianming-year"
-              v-model.number="xianMingYear"
-              type="number"
-              inputmode="numeric"
-              placeholder="如 1948"
-              min="1"
-              max="9999"
-            />
-            <button
-              v-if="xianMingYear"
-              type="button"
-              class="fj-xm-clear"
-              @click="xianMingYear = null"
-            >
-              清空
-            </button>
-          </div>
-          <p v-if="xianMingInfo" class="fj-xm-head">
-            仙命 <b>{{ xianMingInfo.name }}</b> · {{ xianMingInfo.nian }}
-          </p>
-          <template v-if="fenjin">
-            <p class="fj-row">
-              坐分金：<b>{{ fenjin.shan.name }}</b
-              >（{{ fenjin.shan.nian || '—' }}）·
-              <span
-                class="fj-level"
-                :class="fenjin.shan.ji === '吉' ? 'fj-gold' : 'fj-bad'"
-                >{{ fenjin.shan.level }}</span
+          <h2>{{ slotTitle }}</h2>
+          <template v-if="ringSlot === 'fenjin'">
+            <p class="fj-hint">点按居中即正向·龟甲，拖拽微调至旺相分金</p>
+            <div class="fj-xianming">
+              <label for="xianming-year">仙命（出生年）：</label>
+              <input
+                id="xianming-year"
+                v-model.number="xianMingYear"
+                type="number"
+                inputmode="numeric"
+                placeholder="如 1948"
+                min="1"
+                max="9999"
+              />
+              <button
+                v-if="xianMingYear"
+                type="button"
+                class="fj-xm-clear"
+                @click="xianMingYear = null"
               >
-              · {{ fenjin.shan.ji }}
+                清空
+              </button>
+            </div>
+            <p v-if="xianMingInfo" class="fj-xm-head">
+              仙命 <b>{{ xianMingInfo.name }}</b> · {{ xianMingInfo.nian }}
             </p>
-            <p class="fj-text">{{ fenjin.shan.text }}</p>
-            <p
-              v-if="shanXm"
-              class="fj-text fj-xm"
-              :class="shanXm.ji === '吉' ? 'fj-xm-good' : 'fj-xm-bad'"
-            >
-              仙命配分金：{{ shanXm.text }}
-            </p>
-            <p class="fj-row">
-              向分金：<b>{{ fenjin.xiang.name }}</b
-              >（{{ fenjin.xiang.nian || '—' }}）·
-              <span
-                class="fj-level"
-                :class="fenjin.xiang.ji === '吉' ? 'fj-gold' : 'fj-bad'"
-                >{{ fenjin.xiang.level }}</span
+            <template v-if="fenjin">
+              <p class="fj-row">
+                坐分金：<b>{{ fenjin.shan.name }}</b
+                >（{{ fenjin.shan.nian || '—' }}）·
+                <span
+                  class="fj-level"
+                  :class="fenjin.shan.ji === '吉' ? 'fj-gold' : 'fj-bad'"
+                  >{{ fenjin.shan.level }}</span
+                >
+                · {{ fenjin.shan.ji }}
+              </p>
+              <p class="fj-text">{{ fenjin.shan.text }}</p>
+              <p
+                v-if="shanXm"
+                class="fj-text fj-xm"
+                :class="shanXm.ji === '吉' ? 'fj-xm-good' : 'fj-xm-bad'"
               >
-              · {{ fenjin.xiang.ji }}
-            </p>
-            <p class="fj-text">{{ fenjin.xiang.text }}</p>
-            <p
-              v-if="xiangXm"
-              class="fj-text fj-xm"
-              :class="xiangXm.ji === '吉' ? 'fj-xm-good' : 'fj-xm-bad'"
-            >
-              仙命配分金：{{ xiangXm.text }}
-            </p>
+                仙命配分金：{{ shanXm.text }}
+              </p>
+              <p class="fj-row">
+                向分金：<b>{{ fenjin.xiang.name }}</b
+                >（{{ fenjin.xiang.nian || '—' }}）·
+                <span
+                  class="fj-level"
+                  :class="fenjin.xiang.ji === '吉' ? 'fj-gold' : 'fj-bad'"
+                  >{{ fenjin.xiang.level }}</span
+                >
+                · {{ fenjin.xiang.ji }}
+              </p>
+              <p class="fj-text">{{ fenjin.xiang.text }}</p>
+              <p
+                v-if="xiangXm"
+                class="fj-text fj-xm"
+                :class="xiangXm.ji === '吉' ? 'fj-xm-good' : 'fj-xm-bad'"
+              >
+                仙命配分金：{{ xiangXm.text }}
+              </p>
+            </template>
           </template>
-          <p class="fs-disclaimer">一百二十分金 · 文化参考</p>
+
+          <template v-else-if="ringSlot === 'chuanShan'">
+            <p class="fj-hint">
+              穿山七十二龙 · 正针 · 甲子起壬末；旺相可用，孤虚/龟甲/大空亡不可用
+            </p>
+            <template v-if="chuanShan">
+              <p class="fj-row">
+                坐龙：<b>{{ slotShanName }}</b
+                >（{{ chuanShan.shan.nian || '—' }}）·
+                <span
+                  class="fj-level"
+                  :class="chuanShan.shan.ji === '吉' ? 'fj-gold' : 'fj-bad'"
+                  >{{ chuanShan.shan.level }}</span
+                >
+                · {{ chuanShan.shan.ji }}
+              </p>
+              <p class="fj-row">
+                向龙：<b>{{ slotXiangName }}</b
+                >（{{ chuanShan.xiang.nian || '—' }}）·
+                <span
+                  class="fj-level"
+                  :class="chuanShan.xiang.ji === '吉' ? 'fj-gold' : 'fj-bad'"
+                  >{{ chuanShan.xiang.level }}</span
+                >
+                · {{ chuanShan.xiang.ji }}
+              </p>
+              <p class="fj-text">
+                十字线压旺相龙为吉线，安坟立宅人财兴旺；孤虚/龟甲/大空亡为凶线，宜避。
+              </p>
+            </template>
+          </template>
+
+          <template v-else>
+            <p class="fj-hint">
+              透地六十龙 · 平分 ·
+              甲子起壬初；丙子/庚子二旬珠宝吉，甲子/壬子旬差错空亡，戊子旬火坑煞曜
+            </p>
+            <template v-if="touDi">
+              <p class="fj-row">
+                坐龙：<b>{{ slotShanName }}</b
+                >（{{ touDi.shan.nian }} · {{ touDi.shan.qi }}气）·
+                <span
+                  class="fj-level"
+                  :class="touDi.shan.ji === '吉' ? 'fj-gold' : 'fj-bad'"
+                  >{{ touDi.shan.level }}</span
+                >
+                · {{ touDi.shan.ji }}
+              </p>
+              <p class="fj-row">
+                向龙：<b>{{ slotXiangName }}</b
+                >（{{ touDi.xiang.nian }} · {{ touDi.xiang.qi }}气）·
+                <span
+                  class="fj-level"
+                  :class="touDi.xiang.ji === '吉' ? 'fj-gold' : 'fj-bad'"
+                  >{{ touDi.xiang.level }}</span
+                >
+                · {{ touDi.xiang.ji }}
+              </p>
+              <p class="fj-text">
+                取旺相珠宝穴，导龙气入穴；孤虚差错与火坑煞曜为凶，宜避。
+              </p>
+            </template>
+          </template>
+          <p class="fs-disclaimer">{{ slotDisclaimer }}</p>
         </section>
 
         <section class="fs-reading">
@@ -507,6 +589,7 @@ import {
   yearGanZhi,
   judgeXianMing,
 } from '@/utils/fenjin';
+import { chuanShanAt, touDiAt } from '@/utils/luopanRead';
 import {
   overallJudgments,
   specialPositions as spText,
@@ -528,6 +611,13 @@ const selectedDir = ref('子'); // 红针所指 24 山（默认坐子朝午）
 const period = ref(9); // 默认九运（2024-2043）
 const luopanMode = ref('ding'); // 定向 | 消砂 | 纳水 | 择日 | 易卦
 const readout = ref(null); // Luopan 读数
+// 定向圈位：分金 / 穿山 / 透地 共用一圈位，一次只显示一个（默认分金）
+const ringSlot = ref('fenjin');
+const RING_SLOTS = [
+  { id: 'fenjin', label: '分金' },
+  { id: 'chuanShan', label: '穿山' },
+  { id: 'touDi', label: '透地' },
+];
 
 // —— 分金（定向模式立向精度）——
 // 十字线实时角度作为分金定位源；传感运行/拖拽/锁定都经 readout.angle 同步
@@ -555,6 +645,56 @@ const fenjin = computed(() => {
   if (readout.value?.angle === undefined) return null;
   const shanAngle = readout.value.angle + (mode.value === '坐山' ? 0 : 180);
   return judgeFenjin(shanAngle);
+});
+
+// 圈位读数（穿山/透地）：坐 = 十字线物理角（朝向口径 +180，与 fenjin 一致），向 = 坐 +180°
+const longAngle = computed(() =>
+  readout.value?.angle === undefined
+    ? null
+    : readout.value.angle + (mode.value === '坐山' ? 0 : 180)
+);
+const chuanShan = computed(() =>
+  longAngle.value === null
+    ? null
+    : {
+        shan: chuanShanAt(longAngle.value),
+        xiang: chuanShanAt((longAngle.value + 180) % 360),
+      }
+);
+const touDi = computed(() =>
+  longAngle.value === null
+    ? null
+    : {
+        shan: touDiAt(longAngle.value),
+        xiang: touDiAt((longAngle.value + 180) % 360),
+      }
+);
+const slotLong = computed(() =>
+  ringSlot.value === 'chuanShan'
+    ? chuanShan.value
+    : ringSlot.value === 'touDi'
+      ? touDi.value
+      : null
+);
+const slotShanName = computed(() => slotLong.value?.shan.name || '大空亡');
+const slotShanLevel = computed(() => slotLong.value?.shan.level ?? '–');
+const slotXiangName = computed(() => slotLong.value?.xiang.name || '大空亡');
+const slotXiangLevel = computed(() => slotLong.value?.xiang.level ?? '–');
+const slotTitle = computed(() => {
+  const map = {
+    fenjin: '分金吉凶',
+    chuanShan: '穿山七十二龙',
+    touDi: '透地六十龙',
+  };
+  return map[ringSlot.value] || '分金吉凶';
+});
+const slotDisclaimer = computed(() => {
+  const map = {
+    fenjin: '一百二十分金 · 文化参考',
+    chuanShan: '穿山七十二龙（正针） · 文化参考',
+    touDi: '透地六十龙（平分） · 杨公五气 · 文化参考',
+  };
+  return map[ringSlot.value] || '';
 });
 
 // 仙命配分金：仙命出生年 → 年干支纳音 → 与坐/向分金纳音生克

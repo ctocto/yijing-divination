@@ -44,7 +44,14 @@
           :fill="it.active ? activeFill : 'transparent'"
         />
         <text
-          :class="['label', { active: it.active }]"
+          :class="[
+            'label',
+            {
+              active: it.active,
+              'label-ji': it.tone === 'ji',
+              'label-xiong': it.tone === 'xiong',
+            },
+          ]"
           :style="labelSize ? { fontSize: labelSize + 'px' } : null"
           >{{ it.text }}</text
         >
@@ -115,6 +122,14 @@ const activeFill = 'rgba(178,58,46,0.14)';
   fill: var(--cinnabar);
   font-size: 19px;
   font-weight: 700;
+  opacity: 1;
+}
+.label-ji {
+  fill: var(--gold);
+}
+.label-xiong {
+  fill: var(--ink-light);
+  opacity: 0.55;
 }
 .deg-label {
   font-size: 8px;

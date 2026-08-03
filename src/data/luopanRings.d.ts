@@ -8,6 +8,9 @@ export type RingId =
   | 'human'
   | 'heaven'
   | 'jiazi'
+  | 'fenjin'
+  | 'chuanShan'
+  | 'touDi'
   | 'degrees';
 export interface RingSpec {
   type: RingType;

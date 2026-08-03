@@ -143,6 +143,7 @@ import {
 import { mansions } from '@/data/mansions';
 import { jiazi } from '@/data/jiazi';
 import { wangXiang48 } from '@/data/fenjin';
+import { chuanShan72, touDi60 } from '@/data/long';
 import { fuXiRing } from '@/utils/fuXiOrder';
 import { fenjinAt } from '@/utils/fenjin';
 import { mountainAt, oppositeMountain } from '@/utils/fengShui';
@@ -152,6 +153,8 @@ import {
   hexagramAt,
   mansionAt,
   plateMountainAt,
+  chuanShanAt,
+  touDiAt,
 } from '@/utils/luopanRead';
 import { theme } from '@/styles/theme';
 import {
@@ -163,6 +166,7 @@ const props = defineProps({
   mountain: { type: String, default: '子' },
   mode: { type: String, default: 'ding' },
   fineAngle: { type: Number, default: null },
+  ringSlot: { type: String, default: 'fenjin' }, // 定向圈位：fenjin | chuanShan | touDi
 });
 const emit = defineEmits(['select', 'settle', 'readout']);
 
@@ -202,7 +206,15 @@ const readout = computed(() => ({
 
 watch(readout, (r) => emit('readout', r), { immediate: true, flush: 'post' });
 
-const activeRings = computed(() => modeRings[props.mode] || modeRings.ding);
+// 定向模式：分金/穿山/透地共用一圈位（radius 212），按 ringSlot 换内容
+const activeRings = computed(() => {
+  const list = [...(modeRings[props.mode] || modeRings.ding)];
+  if (props.mode === 'ding') {
+    const i = list.indexOf('fenjin');
+    if (i !== -1) list[i] = props.ringSlot;
+  }
+  return list;
+});
 // 可点按的圈：三盘 24 山（点按即选定方向）
 const interactiveRings = ['earth', 'human', 'heaven'];
 
@@ -288,6 +300,28 @@ function ringItems(id) {
         angle: f.angle,
         text: f.name,
         active: activeName === f.name,
+      }));
+    }
+    case 'chuanShan': {
+      // 60 干支全标（大空亡留空），旺相吉金黄 / 孤虚龟甲暗，十字线所在槽高亮
+      const cur = chuanShanAt(readAngle.value);
+      return chuanShan72
+        .filter((s) => s.name)
+        .map((s) => ({
+          angle: s.angle,
+          text: s.name,
+          tone: s.ji === '吉' ? 'ji' : 'xiong',
+          active: cur.name && cur.name === s.name,
+        }));
+    }
+    case 'touDi': {
+      // 60 龙全标，珠宝吉金黄 / 孤虚火坑暗
+      const cur = touDiAt(readAngle.value);
+      return touDi60.map((s) => ({
+        angle: s.angle,
+        text: s.name,
+        tone: s.ji === '吉' ? 'ji' : 'xiong',
+        active: cur.name === s.name,
       }));
     }
     case 'degrees':

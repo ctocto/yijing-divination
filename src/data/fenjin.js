@@ -37,7 +37,8 @@ export const GAN_SEQ = {
   阴: ['乙', '丁', '己', '辛', '癸'],
 };
 
-const LEVEL_BY_GAN = {
+// 穿山七十二龙复用同口径（甲壬孤、乙癸虚、戊己龟甲、丙丁庚辛旺相）
+export const LEVEL_BY_GAN = {
   甲: '孤',
   壬: '孤',
   乙: '虚',

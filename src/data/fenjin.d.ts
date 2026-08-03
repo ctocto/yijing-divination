@@ -10,5 +10,6 @@ export interface FenJin {
 }
 export const FENJIN_ZHI: Record<string, string>;
 export const GAN_SEQ: { 阳: string[]; 阴: string[] };
+export const LEVEL_BY_GAN: Record<string, '旺相' | '孤' | '虚' | '龟甲'>;
 export const fenjin120: FenJin[];
 export const wangXiang48: FenJin[];

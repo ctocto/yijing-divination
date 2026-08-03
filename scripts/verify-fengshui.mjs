@@ -20,6 +20,7 @@ import {
 import { fuXiRing } from '../src/utils/fuXiOrder.js';
 import { mansions } from '../src/data/mansions.js';
 import { jiazi } from '../src/data/jiazi.js';
+import { chuanShan72, touDi60 } from '../src/data/long.js';
 import {
   humanMountains,
   heavenMountains,
@@ -32,6 +33,8 @@ import {
   hexagramAt,
   mansionAt,
   plateMountainAt,
+  chuanShanAt,
+  touDiAt,
 } from '../src/utils/luopanRead.js';
 import { RING_TYPES, MODES, modeRings } from '../src/data/luopanRings.js';
 import {
@@ -983,6 +986,114 @@ check(
   '戊子仙命+丙子(涧下水) 应杀凶（水克火）'
 );
 check(judgeXianMing(1948, '') === null, '空纳音应返回 null');
+
+// —— 穿山七十二龙（正针·甲子起壬末）——
+check(
+  chuanShan72.length === 72,
+  `穿山七十二龙应 72 槽，实为 ${chuanShan72.length}`
+);
+const csNames = chuanShan72.filter((s) => s.name).map((s) => s.name);
+check(
+  csNames.length === 60 &&
+    new Set(csNames).size === 60 &&
+    csNames.every((n) => jiazi.some((j) => j.name === n)),
+  '穿山应恰好 60 个互异干支'
+);
+check(
+  chuanShan72.filter((s) => !s.name).length === 12,
+  '穿山大空亡应 12 位（八干四维正中）'
+);
+const csAngles = chuanShan72.map((s) => s.angle).sort((a, b) => a - b);
+check(
+  csAngles.length === 72 && csAngles.every((a, i) => a === i * 5),
+  '穿山槽角度应每 5° 连续（0…355）'
+);
+const csAt = (deg) => chuanShan72.find((s) => s.angle === deg);
+check(
+  csAt(0)?.name === '戊子' && csAt(0)?.level === '龟甲' && csAt(0)?.ji === '凶',
+  '子山正中(0°) 应戊子龟甲空亡凶（坐子正中口诀）'
+);
+check(
+  csAt(355)?.name === '丙子' &&
+    csAt(355)?.level === '旺相' &&
+    csAt(355)?.ji === '吉',
+  '子山丙子(355°) 应旺相吉'
+);
+check(
+  csAt(5)?.name === '庚子' && csAt(5)?.level === '旺相',
+  '子山庚子(5°) 应旺相'
+);
+check(
+  csAt(350)?.name === '甲子' &&
+    csAt(350)?.level === '孤' &&
+    csAt(350)?.nian === '海中金',
+  '壬山末槽甲子(350°) 应孤·海中金'
+);
+check(
+  csAt(345)?.level === '大空亡' && csAt(345)?.ji === '凶',
+  '壬山正中(345°) 应大空亡凶'
+);
+const csKong = chuanShan72
+  .filter((s) => s.level === '大空亡')
+  .map((s) => s.angle)
+  .sort((a, b) => a - b);
+check(
+  csKong.join(',') === '15,45,75,105,135,165,195,225,255,285,315,345',
+  '大空亡应于八干四维正中 12 处'
+);
+const csWang = chuanShan72.filter((s) => s.level === '旺相');
+check(csWang.length === 24, `穿山旺相应 24 位，实为 ${csWang.length}`);
+check(
+  csWang.every((s) => '丙丁庚辛'.includes(s.gan)),
+  '穿山旺相应全为丙丁庚辛'
+);
+check(chuanShanAt(0).name === '戊子', 'chuanShanAt(0) 应戊子');
+check(chuanShanAt(350).name === '甲子', 'chuanShanAt(350) 应甲子');
+check(chuanShanAt(15).name === '', 'chuanShanAt(15) 应大空亡(name 空)');
+
+// —— 透地六十龙（平分·甲子起壬初）——
+check(touDi60.length === 60, `透地六十龙应 60 龙，实为 ${touDi60.length}`);
+check(
+  touDi60.every((t, i) => t.name === jiazi[i].name),
+  '透地六十龙应按六十甲子顺序命名'
+);
+check(
+  touDi60.every((t, i) => t.angle === (jiazi[i].angle + 340.5) % 360),
+  '透地角度应甲子起壬初(340.5°) 每 6° 连排'
+);
+check(
+  touDi60[0].angle === 340.5 && touDi60[1].angle === 346.5,
+  '透地甲子应 340.5°、乙丑 346.5°'
+);
+const wuQi = [0, 12, 24, 36, 48].map((i) => touDi60[i]);
+check(
+  wuQi.map((x) => x.qi).join('') === '冷正败旺退',
+  '透地五气脉应 冷/正/败/旺/退'
+);
+check(
+  wuQi[0].level === '孤' &&
+    wuQi[0].ji === '凶' &&
+    wuQi[1].level === '旺' &&
+    wuQi[1].ji === '吉' &&
+    wuQi[2].level === '煞' &&
+    wuQi[2].ji === '凶' &&
+    wuQi[3].level === '相' &&
+    wuQi[3].ji === '吉' &&
+    wuQi[4].level === '虚' &&
+    wuQi[4].ji === '凶',
+  '透地五气脉吉凶应 孤凶/旺吉/煞凶/相吉/虚凶'
+);
+check(
+  touDi60.filter((t) => t.ji === '吉').length === 24,
+  '透地珠宝(吉)应 24 位（丙子/庚子二旬）'
+);
+check(touDi60[0].nian === '海中金', '透地甲子应纳音海中金');
+check(
+  touDiAt(0).name === '丁卯' &&
+    touDiAt(0).level === '孤' &&
+    touDiAt(0).ji === '凶',
+  '坐子正中(0°) 透地应丁卯孤凶'
+);
 
 if (failed) process.exit(1);
 console.log(

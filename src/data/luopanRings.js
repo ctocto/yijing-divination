@@ -9,6 +9,8 @@ export const RING_TYPES = {
   heaven: { type: 'labels', radius: 198 }, // 天盘缝针
   jiazi: { type: 'labels', radius: 208, labelSize: 10 }, // 六十甲子（6°/个，2 字须小字号避免重叠）
   fenjin: { type: 'labels', radius: 212, labelSize: 10 }, // 120 分金·只标 48 旺相
+  chuanShan: { type: 'labels', radius: 212, labelSize: 10 }, // 穿山七十二龙（与分金同圈位）
+  touDi: { type: 'labels', radius: 212, labelSize: 10 }, // 透地六十龙（与分金同圈位）
   degrees: { type: 'ticks', radius: 220 }, // 周天度数
 };
 
