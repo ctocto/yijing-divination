@@ -1,4 +1,11 @@
 export function jdn(y: number, m: number, d: number): number;
+export function sunLongitude(jd: number): number;
+export function localJd(y: number, m: number, d: number, hour: number): number;
+export function jdToLocalDate(jd: number): { y: number; m: number; d: number };
+export function jieMoment(
+  year: number,
+  lon: number
+): { y: number; m: number; d: number };
 export interface GanZhiName {
   name: string;
   nian: string;
