@@ -1,6 +1,7 @@
 // 择日读盘直断纯逻辑（不触碰 DOM，node 脚本可直接 import 校验）
 import { jiazi } from '../data/jiazi.js';
 import { termMonth, jianChu, huangDao } from '../data/zeriData.js';
+import { ganzhiOf } from './ganzhi.js';
 
 // 十二地支序（子0 丑1 寅2 … 亥11）
 const BRANCHES = [
@@ -47,5 +48,23 @@ export function judgeZeri(term, jiaziName) {
     jianChu: jianChu[idx],
     huangDao: huangDao[idx],
     nian: jz ? jz.nian : '',
+  };
+}
+
+// 择日判断（真实日期）：公历 → 年/月/日干支 + 建除/黄道/纳音
+export function judgeZeriByDate(y, m, d) {
+  const gz = ganzhiOf(y, m, d);
+  const mB = gz.month.name.slice(-1); // 月建支
+  const dB = gz.day.name.slice(-1); // 日支
+  const idx = jianChuIndex(mB, dB);
+  return {
+    yearGz: gz.year.name,
+    monthGz: gz.month.name,
+    dayGz: gz.day.name,
+    monthB: mB,
+    dayB: dB,
+    jianChu: jianChu[idx],
+    huangDao: huangDao[idx],
+    nian: gz.day.nian,
   };
 }

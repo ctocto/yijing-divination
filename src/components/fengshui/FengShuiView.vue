@@ -411,18 +411,60 @@
       <template v-else-if="luopanMode === 'ze'">
         <section class="fs-zeri">
           <h2>择日判断</h2>
-          <p class="zeri-head">
-            {{ readout?.term ?? '–' }} · {{ readout?.jiazi ?? '–' }}（{{
-              zeriInfo?.nian ?? '–'
-            }}）
-          </p>
-          <p class="zeri-main">
-            {{ zeriInfo?.monthB ?? '–' }}月 · {{ zeriInfo?.dayB ?? '–' }}日 ·
-            <b>{{ zeriInfo?.jianChu?.name ?? '–' }}</b
-            >日（{{ zeriInfo?.huangDao?.name ?? '–' }} ·
-            {{ zeriInfo?.huangDao?.dao ?? '–' }}道）
-          </p>
-          <p class="zeri-text">{{ zeriInfo?.jianChu?.text ?? '' }}</p>
+          <div class="zeri-source" role="group" aria-label="择日来源">
+            <button
+              type="button"
+              :class="{ active: zeriSource === 'calendar' }"
+              @click="zeriSource = 'calendar'"
+            >
+              日历
+            </button>
+            <button
+              type="button"
+              :class="{ active: zeriSource === 'read' }"
+              @click="zeriSource = 'read'"
+            >
+              读盘
+            </button>
+          </div>
+          <template v-if="zeriSource === 'calendar'">
+            <input
+              v-model="zeriDate"
+              type="date"
+              class="zeri-date-input"
+              aria-label="选择日期"
+            />
+            <template v-if="zeriDateInfo">
+              <p class="zeri-head">
+                {{ zeriDate }} ·
+                <b
+                  >{{ zeriDateInfo.yearGz }}年 {{ zeriDateInfo.monthGz }}月
+                  {{ zeriDateInfo.dayGz }}日</b
+                >（{{ zeriDateInfo.nian }}）
+              </p>
+              <p class="zeri-main">
+                {{ zeriDateInfo.monthB }}月 · {{ zeriDateInfo.dayB }}日 ·
+                <b>{{ zeriDateInfo.jianChu?.name ?? '–' }}</b
+                >日（{{ zeriDateInfo.huangDao?.name ?? '–' }} ·
+                {{ zeriDateInfo.huangDao?.dao ?? '–' }}道）
+              </p>
+              <p class="zeri-text">{{ zeriDateInfo.jianChu?.text ?? '' }}</p>
+            </template>
+          </template>
+          <template v-else>
+            <p class="zeri-head">
+              {{ readout?.term ?? '–' }} · {{ readout?.jiazi ?? '–' }}（{{
+                zeriInfo?.nian ?? '–'
+              }}）
+            </p>
+            <p class="zeri-main">
+              {{ zeriInfo?.monthB ?? '–' }}月 · {{ zeriInfo?.dayB ?? '–' }}日 ·
+              <b>{{ zeriInfo?.jianChu?.name ?? '–' }}</b
+              >日（{{ zeriInfo?.huangDao?.name ?? '–' }} ·
+              {{ zeriInfo?.huangDao?.dao ?? '–' }}道）
+            </p>
+            <p class="zeri-text">{{ zeriInfo?.jianChu?.text ?? '' }}</p>
+          </template>
           <p class="fs-disclaimer">建除十二神 · 文化参考</p>
         </section>
       </template>
@@ -458,7 +500,7 @@ import {
   yaoAt,
   judgeGuaQi,
 } from '@/utils/yijing';
-import { judgeZeri } from '@/utils/zeri';
+import { judgeZeri, judgeZeriByDate } from '@/utils/zeri';
 import {
   judgeFenjin,
   fenjinAt,
@@ -640,6 +682,21 @@ const zeriInfo = computed(() =>
     ? judgeZeri(readout.value.term, readout.value.jiazi)
     : null
 );
+// —— 择日（真实日历）——
+const zeriSource = ref('calendar'); // 'calendar' 日历 | 'read' 读盘
+const zeriDate = ref(todayStr()); // YYYY-MM-DD，默认今天
+const zeriDateInfo = computed(() => {
+  if (zeriSource.value !== 'calendar' || !zeriDate.value) return null;
+  const [y, m, d] = zeriDate.value.split('-').map(Number);
+  if (!y || !m || !d) return null;
+  return judgeZeriByDate(y, m, d);
+});
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+    d.getDate()
+  ).padStart(2, '0')}`;
+}
 
 // 自动抽爻：十字线角度 → 所压卦爻（线压爻动）；易卦模式实时联动变卦
 watch(
@@ -871,6 +928,44 @@ onBeforeUnmount(stopCompass);
   color: var(--ink-light);
   font-size: 13px;
   margin-top: 8px;
+}
+.zeri-source {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.zeri-source button {
+  padding: 6px 18px;
+  font-size: 13px;
+  color: var(--ink-light);
+  background: var(--scroll);
+  border: 1px solid var(--gold);
+  border-left: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+.zeri-source button:first-child {
+  border-left: 1px solid var(--gold);
+  border-radius: 4px 0 0 4px;
+}
+.zeri-source button:last-child {
+  border-radius: 0 4px 4px 0;
+}
+.zeri-source button.active {
+  background: var(--cinnabar);
+  color: #faf3e8;
+}
+.zeri-date-input {
+  display: block;
+  margin: 0 auto 10px;
+  padding: 7px 10px;
+  font-size: 14px;
+  color: var(--deep-ink);
+  background: var(--scroll);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
 }
 .zeri-head {
   font-size: 14px;

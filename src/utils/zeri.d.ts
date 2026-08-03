@@ -9,3 +9,18 @@ export interface ZeriResult {
   nian: string;
 }
 export function judgeZeri(term: string, jiaziName: string): ZeriResult;
+export interface ZeriByDateResult {
+  yearGz: string;
+  monthGz: string;
+  dayGz: string;
+  monthB: string;
+  dayB: string;
+  jianChu: ZeriResult['jianChu'];
+  huangDao: ZeriResult['huangDao'];
+  nian: string;
+}
+export function judgeZeriByDate(
+  y: number,
+  m: number,
+  d: number
+): ZeriByDateResult;

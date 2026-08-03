@@ -80,7 +80,16 @@ import {
   monthBranch,
   jianChuIndex,
   judgeZeri,
+  judgeZeriByDate,
 } from '../src/utils/zeri.js';
+import {
+  jdn,
+  dayGanZhi,
+  jieZhi,
+  yearGanZhiAt,
+  monthGanZhi,
+  ganzhiOf,
+} from '../src/utils/ganzhi.js';
 import {
   fenjin120,
   wangXiang48,
@@ -760,6 +769,63 @@ check(zr.jianChu.name === '开', '寅月子日应为开日');
 check(zr.huangDao.name === '司命', '开日对应司命（黄道）');
 check(zr.huangDao.dao === '黄', '司命应为黄道');
 check(zr.nian === '海中金', '甲子纳音应海中金');
+
+// —— 干支纪日（真实日期，JDN 公式）——
+check(jdn(2000, 1, 1) === 2451545, '2000-01-01 儒略日应 2451545');
+check(
+  dayGanZhi(1949, 10, 1).name === '甲子',
+  '1949-10-01 应甲子日（开国大典）'
+);
+check(dayGanZhi(2000, 1, 1).name === '戊午', '2000-01-01 应戊午日');
+check(dayGanZhi(1949, 10, 1).nian === '海中金', '甲子日纳音应海中金');
+
+// —— 干支纪年（立春 2/4 为年界）——
+check(
+  yearGanZhiAt(2000, 1, 1).name === '己卯',
+  '2000-01-01 立春前应己卯年（1999）'
+);
+check(yearGanZhiAt(2024, 2, 10).name === '甲辰', '2024-02-10 立春后应甲辰年');
+check(yearGanZhiAt(2024, 2, 3).name === '癸卯', '2024-02-03 立春前应癸卯年');
+
+// —— 月建支（近似节气表）——
+check(jieZhi(2024, 2, 10) === '寅', '2024-02-10 应寅月（立春起）');
+check(jieZhi(2024, 1, 1) === '子', '2024-01-01 应子月（大雪起）');
+check(jieZhi(2024, 4, 6) === '辰', '2024-04-06 应辰月（清明起）');
+check(jieZhi(2024, 12, 8) === '子', '2024-12-08 应子月（大雪起）');
+
+// —— 月干支（五虎遁）——
+check(monthGanZhi('甲', '寅') === '丙寅', '甲年寅月应丙寅');
+check(monthGanZhi('己', '酉') === '癸酉', '己年酉月应癸酉');
+check(monthGanZhi('戊', '丑') === '乙丑', '戊年丑月应乙丑');
+
+// —— 择日判断（真实日期）——
+const zbd1 = judgeZeriByDate(2024, 2, 10);
+check(
+  zbd1.yearGz === '甲辰' && zbd1.monthGz === '丙寅' && zbd1.dayGz === '甲辰',
+  '2024-02-10 应甲辰年丙寅月甲辰日'
+);
+check(
+  zbd1.monthB === '寅' && zbd1.dayB === '辰' && zbd1.jianChu.name === '满',
+  '2024-02-10 寅月辰日应满日'
+);
+check(
+  zbd1.huangDao.name === '天刑' && zbd1.huangDao.dao === '黑',
+  '满日对应天刑黑道'
+);
+const zbd2 = judgeZeriByDate(1949, 10, 1);
+check(
+  zbd2.yearGz === '己丑' && zbd2.monthGz === '癸酉' && zbd2.dayGz === '甲子',
+  '1949-10-01 应己丑年癸酉月甲子日'
+);
+check(
+  zbd2.jianChu.name === '平' && zbd2.huangDao.name === '朱雀',
+  '1949-10-01 酉月子日应平日朱雀黑道'
+);
+// ganzhiOf 与 judgeZeriByDate 一致性
+check(
+  ganzhiOf(2024, 2, 10).day.name === zbd1.dayGz,
+  'ganzhiOf 日干支应与 judgeZeriByDate 一致'
+);
 
 // —— 120 分金数据 ——
 check(fenjin120.length === 120, `120 分金应 120 条，实为 ${fenjin120.length}`);
