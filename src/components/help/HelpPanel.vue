@@ -273,6 +273,7 @@ onMounted(() => {
 .gb-note {
   font-size: 13px;
   line-height: 1.8;
+  white-space: pre-line;
   color: var(--ink);
   border-left: 4px solid var(--gold);
   border-radius: 0 8px 8px 0;

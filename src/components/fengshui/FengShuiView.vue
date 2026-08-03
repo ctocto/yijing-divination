@@ -89,6 +89,9 @@
             </button>
           </div>
           <p class="period-range">{{ periodInfo }}</p>
+          <p class="fs-school-hint">
+            门派（八宅/玄空）只影响选哪一面为朝向，判断均以玄空为基准；八宅断法暂未支持
+          </p>
         </template>
 
         <div v-if="compassSupported" class="compass-row">
@@ -622,7 +625,13 @@ const period = ref(9); // 默认九运（2024-2043）
 const luopanMode = ref('ding'); // 定向 | 消砂 | 纳水 | 择日 | 易卦
 const readout = ref(null); // Luopan 读数
 // 操作手册「？」定位章节：按当前模式跳转（ding 含分金/穿山/透地/飞星，统一落 ding 章）
-const HELP_SECTION = { ding: 'ding', xiao: 'xiao', na: 'na', ze: 'ze', gua: 'gua' };
+const HELP_SECTION = {
+  ding: 'ding',
+  xiao: 'xiao',
+  na: 'na',
+  ze: 'ze',
+  gua: 'gua',
+};
 const helpSectionId = computed(
   () => HELP_SECTION[luopanMode.value] || 'overview'
 );
@@ -1299,6 +1308,13 @@ onBeforeUnmount(stopCompass);
   font-size: 12px;
   color: var(--ink-light);
   margin: 0 0 10px;
+}
+.fs-school-hint {
+  font-size: 12px;
+  color: var(--ink-light);
+  margin: 0 auto 10px;
+  max-width: 520px;
+  text-align: center;
 }
 .compass-row {
   display: flex;
