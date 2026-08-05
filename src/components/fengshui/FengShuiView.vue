@@ -312,6 +312,9 @@
               </p>
             </template>
           </template>
+          <button class="fs-copy-btn" type="button" @click="onCopySlot">
+            {{ slotCopied ? '已复制' : '复制解读' }}
+          </button>
           <p class="fs-disclaimer">{{ slotDisclaimer }}</p>
         </section>
 
@@ -344,6 +347,9 @@
             </li>
           </ul>
 
+          <button class="fs-copy-btn" type="button" @click="onCopyReading">
+            {{ readingCopied ? '已复制' : '复制解读' }}
+          </button>
           <p class="fs-disclaimer">玄空飞星 · 文化参考</p>
         </section>
       </template>
@@ -388,6 +394,9 @@
           <p v-if="currentSha" class="sha-detail">
             {{ currentSha.dir }}·{{ currentSha.name }}：{{ currentSha.text }}
           </p>
+          <button class="fs-copy-btn" type="button" @click="onCopySha">
+            {{ shaCopied ? '已复制' : '复制解读' }}
+          </button>
           <p class="fs-disclaimer">赖公砂法 · 文化参考</p>
         </section>
       </template>
@@ -441,6 +450,9 @@
             <p class="shui-summary">{{ shuiInfo.summary }}</p>
           </template>
           <p v-else class="shui-hint">请先锁定来水与去水方位</p>
+          <button class="fs-copy-btn" type="button" @click="onCopyShui">
+            {{ shuiCopied ? '已复制' : '复制解读' }}
+          </button>
           <p class="fs-disclaimer">三合水法 · 文化参考</p>
         </section>
       </template>
@@ -499,6 +511,9 @@
             </p>
           </template>
           <p v-else class="yi-none">选一爻看变卦</p>
+          <button class="fs-copy-btn" type="button" @click="onCopyGua">
+            {{ guaCopied ? '已复制' : '复制解读' }}
+          </button>
           <p class="fs-disclaimer">玄空大卦抽爻 · 文化参考</p>
         </section>
       </template>
@@ -560,6 +575,9 @@
             </p>
             <p class="zeri-text">{{ zeriInfo?.jianChu?.text ?? '' }}</p>
           </template>
+          <button class="fs-copy-btn" type="button" @click="onCopyZeri">
+            {{ zeriCopied ? '已复制' : '复制解读' }}
+          </button>
           <p class="fs-disclaimer">建除十二神 · 文化参考</p>
         </section>
       </template>
@@ -616,6 +634,15 @@ import {
   mountainAt,
 } from '@/utils/fengShui';
 import { useCompassSensor } from '@/composables/useCompassSensor';
+import { useCopy } from '@/composables/useCopy';
+import {
+  buildSlotText,
+  buildReadingText,
+  buildShaText,
+  buildShuiText,
+  buildGuaText,
+  buildZeriText,
+} from '@/utils/fengShuiText';
 
 defineEmits(['close', 'help']);
 
@@ -923,6 +950,96 @@ function lockCompass() {
 function stopSensor() {
   stopCompass();
   fineAngle.value = null; // 取消传感：归位已锁定山中心
+}
+
+// —— 复制解读（各模式区块独立反馈）——
+const { copied: slotCopied, copyText: copySlot } = useCopy();
+const { copied: readingCopied, copyText: copyReading } = useCopy();
+const { copied: shaCopied, copyText: copySha } = useCopy();
+const { copied: shuiCopied, copyText: copyShui } = useCopy();
+const { copied: guaCopied, copyText: copyGua } = useCopy();
+const { copied: zeriCopied, copyText: copyZeri } = useCopy();
+
+const slotCopyText = computed(() =>
+  buildSlotText({
+    title: slotTitle.value,
+    ringSlot: ringSlot.value,
+    fenjin: fenjin.value,
+    chuanShan: chuanShan.value,
+    touDi: touDi.value,
+    shanName: slotShanName.value,
+    shanLevel: slotShanLevel.value,
+    xiangName: slotXiangName.value,
+    xiangLevel: slotXiangLevel.value,
+    xianMingInfo: xianMingInfo.value,
+    shanXm: shanXm.value,
+    xiangXm: xiangXm.value,
+  })
+);
+const readingCopyText = computed(() =>
+  buildReadingText({
+    shan: shan.value,
+    xiang: xiang.value,
+    period: period.value,
+    overallInfo: overallInfo.value,
+    judges: judges.value,
+    special: special.value,
+    spText,
+  })
+);
+const shaCopyText = computed(() =>
+  buildShaText({
+    selectedDir: selectedDir.value,
+    shanSheng: shanSheng.value,
+    shanLine: shanLine.value,
+    baShaInfo: baShaInfo.value,
+    shaRows: shaRows.value,
+    currentSha: currentSha.value,
+  })
+);
+const shuiCopyText = computed(() =>
+  buildShuiText({
+    selectedDir: selectedDir.value,
+    shuiJu: shuiJu.value,
+    flow: flow.value,
+    shuiInfo: shuiInfo.value,
+  })
+);
+const guaCopyText = computed(() =>
+  buildGuaText({
+    benGuaName: benGuaName.value,
+    chouYao: chouYao.value,
+    guaQi: guaQi.value,
+    guaFenjinText: guaFenjinText.value,
+  })
+);
+const zeriCopyText = computed(() =>
+  buildZeriText({
+    source: zeriSource.value,
+    zeriDate: zeriDate.value,
+    zeriDateInfo: zeriDateInfo.value,
+    zeriInfo: zeriInfo.value,
+    readout: readout.value,
+  })
+);
+
+function onCopySlot() {
+  copySlot(slotCopyText.value);
+}
+function onCopyReading() {
+  copyReading(readingCopyText.value);
+}
+function onCopySha() {
+  copySha(shaCopyText.value);
+}
+function onCopyShui() {
+  copyShui(shuiCopyText.value);
+}
+function onCopyGua() {
+  copyGua(guaCopyText.value);
+}
+function onCopyZeri() {
+  copyZeri(zeriCopyText.value);
 }
 
 // 离开页面即停止监听，避免后台耗电
@@ -1578,6 +1695,27 @@ onBeforeUnmount(stopCompass);
 }
 .yi-guaqi.bad {
   color: var(--ink-light);
+}
+.fs-copy-btn {
+  display: block;
+  margin: 18px auto 0;
+  padding: 8px 24px;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background-color 0.2s;
+}
+.fs-copy-btn:hover {
+  color: var(--cinnabar);
+  border-color: var(--cinnabar);
+  background: rgba(178, 58, 46, 0.05);
 }
 .fs-disclaimer {
   margin-top: 24px;
